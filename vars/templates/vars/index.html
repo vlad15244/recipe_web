@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Список рецептов</title>
+    </head>
+    <body>
+        <h1>Рецепты</h1>
+        {% for recipe in recipes %}
+        <div>
+            <h2>{{recipe.title}}</h2>
+            <p>{{recipe.created_at}}</p>            
+        </div>
+        {% endfor %}
+    </body>
+
+</html>
