@@ -1,0 +1,230 @@
+/* Dracula Theme Colors */
+:root {
+  --dracula-background: #282a36;
+  --dracula-current-line: #44475a;
+  --dracula-selection: #44475a;
+  --dracula-foreground: #f8f8f2;
+  --dracula-comment: #6272a4;
+  --dracula-cyan: #8be9fd;
+  --dracula-green: #50fa7b;
+  --dracula-orange: #ffb86c;
+  --dracula-pink: #ff79c6;
+  --dracula-purple: #bd93f9;
+  --dracula-red: #ff5555;
+  --dracula-yellow: #f1fa8c;
+  --table_width: 600px;
+}
+
+/* Базовый стиль страницы */
+body {
+  background-color: var(--dracula-background);
+  color: var(--dracula-foreground);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+  margin: 0;
+  padding: 20px;
+  line-height: 1.6;
+}
+
+/* Заголовки */
+h1, h2, h3, h4, h5, h6 {
+  color: var(--dracula-purple);
+  margin-top: 1.5em;
+  margin-bottom: 0.5em;
+}
+
+/* Параграфы и текст */
+p {
+  margin-bottom: 1em;
+}
+
+
+
+/* Ссылки */
+a {
+  color: var(--dracula-cyan);
+  text-decoration: none;
+  transition: color 0.3s;
+}
+
+a:hover {
+  color: var(--dracula-pink);
+}
+
+/* Кнопки */
+button,
+.btn {
+  background-color: var(--dracula-green);
+  color: var(--dracula-background);
+  border: none;
+  padding: 10px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background-color 0.3s, transform 0.1s;
+  width: 250px;
+  height: 50px;
+}
+
+button:hover,
+.btn:hover {
+  background-color: var(--dracula-purple);
+  transform: translateY(-1px);
+}
+
+button:active,
+.btn:active {
+  transform: translateY(0);
+}
+
+/* Формы: input, textarea, select */
+textarea,
+select {
+  background-color: var(--dracula-current-line);
+  color: var(--dracula-foreground);
+  border: 1px solid var(--dracula-selection);
+  padding: 10px;
+  border-radius: 4px;
+  width: 100%;
+  box-sizing: border-box;
+  font-size: 1rem;
+  margin-bottom: 10px;
+  transition: border-color 0.3s;
+}
+
+input {
+  background-color: var(--dracula-current-line);
+  color: var(--dracula-foreground);
+  border: 1px solid var(--dracula-selection);
+  padding: 10px;
+  border-radius: 4px;
+  width: 250px;
+  height: 50px;  
+  box-sizing: border-box;
+  font-size: 1rem;
+  margin-bottom: 10px;
+  transition: border-color 0.3s;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  outline: none;
+  border-color: var(--dracula-purple);
+}
+
+/* Блоки кода (например, <pre><code>) */
+pre {
+  background-color: var(--dracula-current-line);
+  padding: 16px;
+  border-radius: 6px;
+  overflow-x: auto;
+  margin: 1.2em 0;
+}
+
+code {
+  font-family: "Fira Code", "Consolas", monospace;
+  font-size: 0.9em;
+}
+
+pre code {
+  color: var(--dracula-foreground);
+  background-color: transparent;
+  padding: 0;
+}
+
+/* Таблицы */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.2em 0;
+}
+
+table th,
+table td {
+  border: 1px solid var(--dracula-selection);
+  padding: 12px;
+  text-align: left;
+}
+
+table th {
+  background-color: var(--dracula-current-line);
+  color: var(--dracula-cyan);
+}
+
+table tr:nth-child(even) {
+  background-color: var(--dracula-selection);
+}
+
+/* Блоки цитат */
+blockquote {
+  border-left: 4px solid var(--dracula-pink);
+  padding-left: 16px;
+  color: var(--dracula-comment);
+  margin: 1.2em 0;
+  font-style: italic;
+}
+
+/* Списки */
+ul, ol {
+  margin-left: 20px;
+  margin-bottom: 1em;
+}
+
+li {
+  margin-bottom: 0.4em;
+}
+
+/* Горизонтальная линия */
+hr {
+  border: 1px solid var(--dracula-selection);
+  margin: 2em 0;
+}
+
+
+.state-false {
+  color: var(--dracula-foreground);
+
+}
+
+.state-true {
+  color: var(--dracula-green);
+}
+
+.fixed-table-width {
+  width: 1500px;
+  table-layout: fixed;  
+}
+
+.button-group {
+  display: flex;
+  gap: 10px; /* расстояние между кнопками */
+}
+
+/* Классы для акцентов */
+.text-cyan { color: var(--dracula-cyan); }
+.text-green { color: var(--dracula-green); }
+.text-orange { color: var(--dracula-orange); }
+.text-pink { color: var(--dracula-pink); }
+.text-purple { color: var(--dracula-purple); }
+.text-red { color: var(--dracula-red); }
+.text-yellow { color: var(--dracula-yellow); }
+
+.bg-current-line { background-color: var(--dracula-current-line); }
+.bg-selection { background-color: var(--dracula-selection); }
+
+/* Контейнер-обёртка для контента */
+.container {
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+  body {
+    padding: 15px;
+  }
+  
+  .container {
+    padding: 0 10px;
+  }
+}

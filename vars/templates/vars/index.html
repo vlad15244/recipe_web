@@ -1,17 +1,25 @@
-<!DOCTYPE html>
-<html>
-    <head>
-        <meta charset="UTF-8">
-        <title>Список рецептов</title>
-    </head>
-    <body>
-        <h1>Рецепты</h1>
-        {% for recipe in recipes %}
-        <div>
-            <h2>{{recipe.title}}</h2>
-            <p>{{recipe.created_at}}</p>            
-        </div>
-        {% endfor %}
-    </body>
+{% extends "base.html" %}
 
-</html>
+{% block content %}
+
+        <h1>Список рецептов</h1>
+        <table class="recipe-table">
+        <thead>
+            <tr>
+            <th>ID</th>
+            <th>Наименование</th>
+            <th>Дата создания</th>            
+            </tr>
+        </thead>
+        <tbody>
+            {% for recipe in recipes %}
+            <tr>
+            <td><h2>{{ recipe.id }}</h2></td>                
+            <td><h3>{{ recipe.name }}</h3></td>
+            <td><p>{{ recipe.created_at }}</p></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+        </table>
+<a href="{% url 'add_new' %}" class="btn">Добавить новый рецепт</a>
+{% endblock %}

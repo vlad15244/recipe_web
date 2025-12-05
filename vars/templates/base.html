@@ -1,0 +1,21 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <link rel="stylesheet" href="{%static 'vars/css/dracula.css' %}">
+        <title>Список рецептов</title>
+    </head>
+    <body>
+        <div class="button-group">
+            <button>Главный экран</button>
+            <button>Рецепты</button>
+            <button>Настройка</button>
+        </div>
+        <div id="content">
+            {% block content %} {% endblock %}
+        </div>   
+    </body> 
+
+</html>
