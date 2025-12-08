@@ -9,8 +9,8 @@
     </head>
     <body>
         <div class="button-group">
-            <button>Главный экран</button>
-            <button>Рецепты</button>
+            <a href="{% url 'realtime' %}" class="btn">Главный экран</a>
+            <a href="{% url 'recipe_list' %}" class="btn">Рецепты</a>
             <button>Настройка</button>
         </div>
         <div id="content">

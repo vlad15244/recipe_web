@@ -17,7 +17,10 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 
+from vars import views
+
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('recipes/', include('vars.urls')) 
+    path('recipes/', include('vars.urls'), name='recipe'),
+    path('realtime/', views.opcua_realtime, name='realtime')
 ]

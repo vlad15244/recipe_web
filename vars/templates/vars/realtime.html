@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+        <div id="table-container">
+        <p>Ожидание данных...</p>
+        </div>
+                
+  <script>
+        const socket = new WebSocket('ws://localhost:8000/ws/opcua/');
+        socket.onmessage = function(event) {
+        try {
+                const data = JSON.parse(event.data);
+                console.log('Получены данные:', data);
+
+        } catch (error) {
+                console.error('Ошибка парсинга JSON:', error, 'Данные:', event.data);
+        }
+        };
+  </script>        
+{% endblock %}

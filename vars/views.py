@@ -12,6 +12,8 @@ def index(request):
     return HttpResponse(template.render(context, request))
 # Create your views here.
 
+def opcua_realtime(request):
+    return render(request, 'vars/realtime.html')
 
 def add_recipe(request):
     if request.method == 'POST':
@@ -23,3 +25,4 @@ def add_recipe(request):
         form = RecipeForm()
     
     return render(request, 'vars/add_recipe.html', {'form':form})
+
