@@ -6,6 +6,8 @@ import time
 
 """добавить еще что-то хотел"""
 
+"""добавить обработку ошибки подключения"""
+
 class VariablePLC:
 
     def __init__(self, name, opc_adr, plc: Client, scale: str, ID):
@@ -174,7 +176,6 @@ class VariableList:
 
 
 class PLC:
-
     __client: Client = None
     __Variable_List = VariableList()
     __Is_Connected = False
@@ -197,7 +198,7 @@ class PLC:
     def _attemmpt_coonection(self):
         try:
             print(f"opc.tcp://{self.endpoint}:{self.port}")
-            self.__client = Client(f"opc.tcp://{self.endpoint}:{self.port}")            
+            self.__client = Client(f"opc.tcp://{self.endpoint}:{self.port}")      
             self.__client.connect()
             self.__Is_Connected = True
 

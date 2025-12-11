@@ -41,17 +41,32 @@ INSTALLED_APPS = [
     'vars.apps.VarsConfig'
 ]
 
+WSGI_APPLICATION = 'myproject.wsgi.application'
 
 ASGI_APPLICATION = 'myproject.asgi.application'
 
-CHANNEL_LAYERS = {
+# settings.py
+
+CACHES = {
     'default': {
-        'BACKEND': 'channels_redis.core.RedisChannelLayer',
-        'CONFIG': {
-            "hosts": [('127.0.0.1', 6379)],
+        'BACKEND': 'django_redis.cache.RedisCache',
+        'LOCATION': 'redis://127.0.0.1:6379/1',  # ← проверьте хост и порт!
+        'OPTIONS': {
+            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+        }
+    }
+}
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("127.0.0.1", 6379)],  # ← здесь тоже!
         },
     },
 }
+
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

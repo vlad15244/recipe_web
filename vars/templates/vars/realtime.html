@@ -1,21 +1,26 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block content %}
 
-        <div id="table-container">
-        <p>Ожидание данных...</p>
-        </div>
+  <h2>Данные по каналам</h2>
+  <div id="table-container">
+    <p>Ожидание данных...</p>
+  </div>
                 
-  <script>
-        const socket = new WebSocket('ws://localhost:8000/ws/opcua/');
-        socket.onmessage = function(event) {
-        try {
-                const data = JSON.parse(event.data);
-                console.log('Получены данные:', data);
-
-        } catch (error) {
-                console.error('Ошибка парсинга JSON:', error, 'Данные:', event.data);
+  <script src="{% static 'vars/js/socket.js' %}" defer></script>  
+  
+<button id="onclick" onclick="handleClick()">Вкл/выкл нагрев</button>
+<h3>Уставка</h3>
+<input id="setpoint" type="number" min="0" max="800">
+<script>
+      const input = document.getElementById('setpoint');
+      input.addEventListener('input', function(){
+        const command = {
+            action: "setpoint",
+            value: Number(this.value)
         }
-        };
-  </script>        
+            window.socket.send(JSON.stringify(command));        
+      });
+</script>
 {% endblock %}

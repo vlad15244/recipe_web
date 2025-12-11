@@ -76,6 +76,24 @@ button:active,
   transform: translateY(0);
 }
 
+a.link {
+  text-align: center;          /* Дополнительно для текста */
+  background-color: var(--dracula-green);
+  color: var(--dracula-background);
+  border: none;
+  padding: 10px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background-color 0.3s, transform 0.1s;
+  width: 250px;
+}
+
+a.link:hover {
+  background-color: var(--dracula-purple);
+  transform: translateY(-1px);
+}
+
 /* Формы: input, textarea, select */
 textarea,
 select {
