@@ -125,5 +125,37 @@
         "scale" : "Hardering"    
     
 }
+,
+{
+    "name" : "Recipe_Name",
+    "ID" : 19,
+    "opc_adr" : "GVL_Recipe.name",
+        "scale" : "Default"    
+    
+}
+,
+{
+    "name" : "Recipe_v1",
+    "ID" : 20,
+    "opc_adr" : "GVL_Recipe.v1",
+        "scale" : "Hardering"    
+      
+}
+,
+{
+    "name" : "Recipe_v2",
+    "ID" : 21,
+    "opc_adr" : "GVL_Recipe.v2",
+        "scale" : "Hardering"    
+      
+}
+,
+{
+    "name" : "Recipe_v3",
+    "ID" : 22,
+    "opc_adr" : "GVL_Recipe.v3",
+        "scale" : "TwoState"    
+      
+}
 
 ]

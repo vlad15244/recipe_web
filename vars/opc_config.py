@@ -105,6 +105,7 @@ Power = Scale(0, 100, "%", False)
 TwoState = Scale(0, 1, "", False)
 Default = Scale(0, 100, "", False)
 
+
 SCALE_LIST = {
     "Hardering": Hardering,
     "Power": Power,

@@ -38,7 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'channels',
-    'vars.apps.VarsConfig'
+    'vars'
 ]
 
 WSGI_APPLICATION = 'myproject.wsgi.application'

@@ -2,25 +2,16 @@
 {% load static %}
 
 {% block content %}
-
+  <link rel="stylesheet" href="{% static 'vars/css/styles.css' %}">
   <h2>Данные по каналам</h2>
   <div id="table-container">
     <p>Ожидание данных...</p>
   </div>
                 
-  <script src="{% static 'vars/js/socket.js' %}" defer></script>  
-  
 <button id="onclick" onclick="handleClick()">Вкл/выкл нагрев</button>
 <h3>Уставка</h3>
 <input id="setpoint" type="number" min="0" max="800">
-<script>
-      const input = document.getElementById('setpoint');
-      input.addEventListener('input', function(){
-        const command = {
-            action: "setpoint",
-            value: Number(this.value)
-        }
-            window.socket.send(JSON.stringify(command));        
-      });
-</script>
+
+<script src="{% static 'vars/js/socket.js' %}" defer></script>  
+
 {% endblock %}
