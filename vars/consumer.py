@@ -46,6 +46,17 @@ def write(value, name):
     except Exception as e:
         print(f"Ошибка: {e}")
 
+def recipe_save(recipe):
+    try:
+        var_list.get_variable_by_Name("Recipe_v1").value = recipe.var1
+        var_list.get_variable_by_Name("Recipe_v2").value = recipe.var2
+        var_list.get_variable_by_Name("Recipe_v3").value = recipe.var3
+        var_list.get_variable_by_Name("Recipe_Name").value = recipe.name       
+      
+
+    except Exception as e:
+        print(f"Ошибка: {e}")    
+
 
 class OpcUaConsumer(AsyncWebsocketConsumer):
     async def connect(self):
@@ -120,8 +131,9 @@ class OpcUaConsumer(AsyncWebsocketConsumer):
         elif (json.loads(message)).get("action") == "recipe":
             try:
                 id_recipe = int((json.loads(message)).get("ID"))
-                content = await sync_to_async(Recipe.objects.get)(pk=id_recipe)
-                print(content)
+                recipe = await sync_to_async(Recipe.objects.get)(pk=id_recipe)
+                recipe_save(recipe)
+                
             except Exception as e:
                 logger.error(f"Ошибка чтения данных из PLC: {e}")
                 await self.send(text_data=f'{{"error": "Не удалось прочитать данные: {e}"}}')
