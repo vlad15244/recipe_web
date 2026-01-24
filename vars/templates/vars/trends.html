@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}Тренды{% endblock %}
+{% load static %}
+
+{% block content %}
+
+<link rel="stylesheet" href="{% static 'vars/css/dracula.css' %}">
+
+<form method="get" action="{% url 'trends' %}">
+    <label for="start_date">Дата:</label>
+    <input type="date" class="btn" name="start_date" value="{{ request.GET.start_date }}">
+    <button type="submit" class="input">Искать</button>
+</form>
+
+    {% if has_data %}
+        <table class="trends-table">
+        <thead>
+            <tr>
+            <th>Время</th>
+            <th>PV1</th>
+            <th>PV2</th> 
+            <th>PV3</th>
+            <th>PV4</th>                        
+            </tr>
+        </thead>
+        <tbody>
+            {% for trend in trends %}
+            <tr>
+            <td>{{ trend.0 }}</td>                
+            <td>{{ trend.1 }}</td>
+            <td>{{ trend.2 }}</td>
+            <td>{{ trend.3 }}</td>
+            <td>{{ trend.4 }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+        </table>
+        <a 
+            class="btn btn-primary"
+            href="{% url 'trends_pdf' %}?start_date={{ selected_date }}"
+            target="_blank"
+        >
+            Download as PDF
+        </a>       
+    {% else %}
+        <div class="no-data">
+            <p>Нет данный за выбранный период</p>
+        </div>          
+    {% endif %}
+
+
+<!-- Кнопка для скачивания PDF -->
+
+{% endblock %}

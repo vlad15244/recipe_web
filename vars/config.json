@@ -1,0 +1,177 @@
+[{
+    "name" : "PV1",
+    "ID" : 1,
+    "opc_adr" : "GVL_Termodat.TERMODAT[1].PV",
+    "scale" : "Hardering", 
+    "isArchive" : "True"
+
+},
+{
+    "name" : "PV2",
+    "ID" : 2,
+    "opc_adr" : "GVL_Termodat.TERMODAT[2].PV",
+        "scale" : "Hardering",
+    "isArchive" : "True"    
+},
+{
+    "name" : "PV3",
+    "ID" : 3,
+    "opc_adr" : "GVL_Termodat.TERMODAT[3].PV",
+        "scale" : "Hardering",
+    "isArchive" : "True"    
+},
+{
+    "name" : "PV4",
+    "ID" : 4,
+    "opc_adr" : "GVL_Termodat.TERMODAT[4].PV",
+    "scale" : "Hardering",
+    "isArchive" : "True"
+},
+{
+    "name" : "SP1",
+    "ID" : 5,
+    "opc_adr" : "GVL_Termodat.TERMODAT[1].SP",
+    "scale" : "Hardering",
+    "isArchive" : "False"    
+},
+{
+    "name" : "SP2",
+    "ID" : 6,
+    "opc_adr" : "GVL_Termodat.TERMODAT[2].SP",
+        "scale" : "Hardering",
+    "isArchive" : "False"    
+},
+{
+    "name" : "SP3",
+    "ID" : 7,
+    "opc_adr" : "GVL_Termodat.TERMODAT[3].SP",
+        "scale" : "Hardering",
+    "isArchive" : "False"    
+},
+{
+    "name" : "SP4",
+    "ID" : 8,
+    "opc_adr" : "GVL_Termodat.TERMODAT[4].SP",
+        "scale" : "Hardering",
+     "isArchive" : "False"   
+},
+{
+    "name" : "MV1",
+    "ID" : 9,
+    "opc_adr" : "GVL_Termodat.TERMODAT[1].MV",
+        "scale" : "Power",
+    "isArchive" : "False"    
+},
+{
+    "name" : "MV2",
+    "ID" : 10,
+    "opc_adr" : "GVL_Termodat.TERMODAT[2].MV",
+            "scale" : "Power",
+    "isArchive" : "False"   
+},
+{
+    "name" : "MV3",
+    "ID" : 11,
+    "opc_adr" : "GVL_Termodat.TERMODAT[3].MV",
+            "scale" : "Power",
+    "isArchive" : "False"    
+},
+{
+    "name" : "MV4",
+    "ID" : 12,
+    "opc_adr" : "GVL_Termodat.TERMODAT[4].MV",
+            "scale" : "Power",
+    "isArchive" : "False"      
+},
+
+{
+    "name" : "eToogle1",
+    "ID" : 13,
+    "opc_adr" : "GVL_Termodat.TERMODAT[1].eToogle",
+    "scale" : "TwoState",
+     "isArchive" : "False"     
+},
+{
+    "name" : "eToogle2",
+    "ID" : 14,
+    "opc_adr" : "GVL_Termodat.TERMODAT[2].eToogle",
+    "scale" : "TwoState",
+    "isArchive" : "False"      
+},
+{
+    "name" : "eToogle3",
+    "ID" : 15,
+    "opc_adr" : "GVL_Termodat.TERMODAT[3].eToogle",
+        "scale" : "TwoState",
+    "isArchive" : "False"      
+},
+{
+    "name" : "eToogle4",
+    "ID" : 16,
+    "opc_adr" : "GVL_Termodat.TERMODAT[4].eToogle",
+        "scale" : "TwoState",
+    "isArchive" : "False"      
+},
+{
+    "name" : "xRegul",
+    "ID" : 17,
+    "opc_adr" : "GVL_Termodat.xRegul",
+        "scale" : "TwoState",
+    "isArchive" : "False"      
+},
+{
+    "name" : "SP_Regule",
+    "ID" : 18,
+    "opc_adr" : "GVL_Termodat.SP",
+        "scale" : "Hardering",    
+     "isArchive" : "False"     
+}
+,
+{
+    "name" : "Recipe_Name",
+    "ID" : 19,
+    "opc_adr" : "GVL_Recipe.name",
+        "scale" : "Default",   
+    "isArchive" : "False"      
+}
+,
+{
+    "name" : "Recipe_v1",
+    "ID" : 20,
+    "opc_adr" : "GVL_Recipe.v1",
+        "scale" : "Hardering",    
+    "isArchive" : "False"        
+}
+,
+{
+    "name" : "Recipe_v2",
+    "ID" : 21,
+    "opc_adr" : "GVL_Recipe.v2",
+        "scale" : "Hardering",    
+    "isArchive" : "False"        
+}
+,
+{
+    "name" : "Recipe_v3",
+    "ID" : 22,
+    "opc_adr" : "GVL_Recipe.v3",
+        "scale" : "TwoState" ,   
+    "isArchive" : "False"        
+}
+,
+{
+    "name" : "xVisible",
+    "ID" : 23,
+    "opc_adr" : "GVL_Termodat.xVisible",
+        "scale" : "TwoState" ,   
+    "isArchive" : "False"        
+}
+,
+{
+    "name" : "Error1",
+    "ID" : 24,
+    "opc_adr" : "PLC_PRG.Error1",
+    "scale" : "TwoState" ,   
+    "isArchive" : "False"        
+}
+]

@@ -1,0 +1,30 @@
+[{
+    "message_id" : 1,
+    "plc_value" : "Error1",
+    "by_value" : false,
+    "text" : 
+    [
+      {
+      "value" : 0,
+      "message" : "Сообщение 1"              
+      },
+      {
+      "value" : 1,
+      "message" : "Сообщение 2"              
+      },
+      {
+      "value" : 2,
+      "message" : "Сообщение 3"              
+      },
+      {
+      "value" : 3,
+      "message" : "Сообщение 4"              
+      },
+      {
+      "value" : 4,
+      "message" : "Сообщение 5"              
+      } 
+           
+    ]
+}
+]

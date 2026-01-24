@@ -1,0 +1,43 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Symbolconfiguration xmlns="http://www.3s-software.com/schemas/Symbolconfiguration.xsd">
+  <Header>
+    <Version>3.5.14.0</Version>
+    <SymbolConfigObject version="4.0.0.0" runtimeid="3.5.17.30" libversion="3.5.17.0" compiler="3.5.17.30" lmm="3.5.17.0" profile="CODESYS V3.5 SP17 Patch 3+" settings="SupportOPCUA, LayoutCalculator=OptimizedClientSideLayoutCalculator" />
+    <ProjectInfo name="recipe_web" devicename="Device" appname="Application" />
+  </Header>
+  <TypeList>
+    <TypeSimple name="T_BOOL" size="1" swapsize="0" typeclass="Bool" iecname="BOOL" />
+    <TypeSimple name="T_INT" size="2" swapsize="2" typeclass="Int" iecname="INT" />
+    <TypeSimple name="T_REAL" size="4" swapsize="4" typeclass="Real" iecname="REAL" />
+    <TypeSimple name="T_WORD" size="2" swapsize="2" typeclass="Word" iecname="WORD" />
+    <TypeSimple name="T_WSTRING_16_" size="34" swapsize="2" typeclass="WString" iecname="WSTRING(16)" />
+    <TypeUserDef name="T_TERMODAT" size="13" nativesize="16" typeclass="Userdef" pouclass="STRUCTURE" iecname="TERMODAT">
+      <UserDefElement iecname="PV" type="T_REAL" byteoffset="0" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="SP" type="T_REAL" byteoffset="4" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="MV" type="T_REAL" byteoffset="8" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="eToogle" type="T_BOOL" byteoffset="12" vartype="VAR" access="ReadWrite" />
+    </TypeUserDef>
+    <TypeArray name="T_ARRAY__1__4__OF_TERMODAT" size="64" nativesize="64" typeclass="Array" iecname="ARRAY [1..4] OF TERMODAT" basetype="T_TERMODAT">
+      <ArrayDim minrange="1" maxrange="4" />
+    </TypeArray>
+  </TypeList>
+  <NodeList>
+    <Node name="Application">
+      <Node name="GVL_Recipe">
+        <Node name="name" type="T_WSTRING_16_" access="ReadWrite" />
+        <Node name="v1" type="T_REAL" access="ReadWrite" />
+        <Node name="v2" type="T_INT" access="ReadWrite" />
+        <Node name="v3" type="T_BOOL" access="ReadWrite" />
+      </Node>
+      <Node name="GVL_Termodat">
+        <Node name="SP" type="T_REAL" access="ReadWrite" />
+        <Node name="TERMODAT" type="T_ARRAY__1__4__OF_TERMODAT" access="ReadWrite" />
+        <Node name="xRegul" type="T_BOOL" access="ReadWrite" />
+        <Node name="xVisible" type="T_BOOL" access="ReadWrite" />
+      </Node>
+      <Node name="PLC_PRG">
+        <Node name="Error1" type="T_WORD" access="ReadWrite" />
+      </Node>
+    </Node>
+  </NodeList>
+</Symbolconfiguration>

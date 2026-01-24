@@ -1,0 +1,19 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Авторизация</title>
+        <link rel="stylesheet" href="{%static 'vars/css/dracula.css' %}">
+    </head>
+    <body>
+        <div class="container1">
+            <p class="login_text">Введите имя пользователя и пароль</p>
+            <form class="login" action="." method="post">
+                {{ form.as_p }}
+                {% csrf_token %}
+                <p><input type="submit" value="Log-in"></p>
+            </form>
+        </div>
+
+    </body>
+</html>

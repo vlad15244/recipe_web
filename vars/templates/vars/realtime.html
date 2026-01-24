@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Главный экран{% endblock %}
+{% block content %}
+  <link rel="stylesheet" href="{% static 'vars/css/styles.css' %}">
+  <h2>Данные по каналам</h2>
+  <div id="table-container">
+    <p>Ожидание данных...</p>
+  </div>
+                
+<button id="onclick" onclick="handleClick()">Вкл/выкл нагрев</button>
+<h3>Уставка</h3>
+<input id="setpoint" type="number" min="0" max="800">
+
+<script src="{% static 'vars/js/socket.js' %}" defer></script>  
+
+{% endblock %}

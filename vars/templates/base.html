@@ -1,0 +1,32 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <link rel="stylesheet" href="{%static 'vars/css/dracula.css' %}">
+        <title>
+            {% block title %}Список рецептов{% endblock %}
+        </title>
+    </head>
+    <body>
+        <div class="header-container">
+            <div class="button-group">
+                <a href="{% url 'realtime' %}" class="link">Главный экран</a>
+                <a href="{% url 'recipe_list' %}" class="link">Рецепты</a>
+                <a href="{% url 'trends' %}" class="link">Тренды</a>
+                <a href="{% url 'message' %}" class="link">Сообщения</a>
+            </div>
+
+            <div class="user-info">
+                {% if user.is_authenticated %}
+                    Пользователь: {{ user.username }}!  
+                {% endif %}
+            </div>        
+        </div> 
+        <div id="content">
+            {% block content %} {% endblock %}
+        </div>      
+    </body> 
+
+</html>

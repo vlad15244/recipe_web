@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}Сообщения{% endblock %}
+{% load static %}
+
+{% block content %}
+
+<link rel="stylesheet" href="{% static 'vars/css/dracula.css' %}">
+
+<form method="get" action="{% url 'message' %}">
+    <label for="start_date">Дата:</label>
+    <input type="date" class="btn" name="start_date" value="{{ request.GET.start_date }}">
+    <button type="submit" class="input">Искать</button>
+</form>
+
+    {% if has_data %}
+        <table class="message-table">
+        <thead>
+            <tr>
+            <th>Время</th>
+            <th>Сообщение</th>                        
+            </tr>
+        </thead>
+        <tbody>
+            {% for message in messages %}
+            <tr>
+            <td>{{ message.timestamp|date:"Y-m-d H:i:s" }}</td>                
+            <td>{{ message.message }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+        </table>     
+    {% else %}
+        <div class="no-data">
+            <p>Нет данный за выбранный период</p>
+        </div>          
+    {% endif %}
+
+{% endblock %}
