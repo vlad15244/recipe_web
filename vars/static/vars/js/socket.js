@@ -12,6 +12,7 @@ function updateTable(data) {
   headerRow.insertCell().textContent = 'SP';
   headerRow.insertCell().textContent = 'MV'; 
   headerRow.insertCell().textContent = 'Состояние регулирования';
+  headerRow.insertCell().textContent = 'Состояние канала'; 
   table.classList.add('fixed-table-width');
 
   // Тело таблицы: по строке на канал (1–4)
@@ -38,8 +39,12 @@ function updateTable(data) {
     cellRegul.textContent = formatStatus(data[`eToogle${channel}`]);
     cellRegul.classList.add();
     colorState(data[`eToogle${channel}`], cellRegul);
-  }
 
+    const cellState = row.insertCell();
+    cellState.textContent = formatCh(data[`xErrorCh${channel}`]);
+    cellState.classList.add();
+    colorCh(data[`xErrorCh${channel}`], cellState);
+  }  
   // Заменяем содержимое контейнера
   container.innerHTML = '';
   container.appendChild(table);
@@ -69,6 +74,14 @@ function formatStatus(value) {
   }
 }
 
+function formatCh(value) {
+  if (typeof value === 'string' && value.includes("False")) {
+    return 'В норме';
+  } else {
+    return 'Авария';
+  }
+}
+
 function colorState(value, cell) {
   cell.classList.remove('state-false', 'state-true');
 
@@ -77,6 +90,17 @@ function colorState(value, cell) {
       cell.classList.add('state-false');
       } else {
         cell.classList.add('state-true');
+      }
+}
+
+function colorCh(value, cell) {
+  cell.classList.remove('state-normal', 'state-alarm');
+
+    if (typeof value === 'string' && value.includes("False"))
+    {
+      cell.classList.add('state-normal');
+      } else {
+        cell.classList.add('state-alarm');
       }
 }
 

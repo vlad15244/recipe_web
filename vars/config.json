@@ -173,5 +173,33 @@
     "opc_adr" : "PLC_PRG.Error1",
     "scale" : "TwoState" ,   
     "isArchive" : "False"        
+},
+{
+    "name" : "xErrorCh1",
+    "ID" : 25,
+    "opc_adr" : "GVL_Termodat.TERMODAT[1].xError",
+        "scale" : "TwoState",
+    "isArchive" : "False"      
+},
+{
+    "name" : "xErrorCh2",
+    "ID" : 26,
+    "opc_adr" : "GVL_Termodat.TERMODAT[2].xError",
+        "scale" : "TwoState",
+    "isArchive" : "False"      
+},
+{
+    "name" : "xErrorCh3",
+    "ID" : 27,
+    "opc_adr" : "GVL_Termodat.TERMODAT[3].xError",
+        "scale" : "TwoState",
+    "isArchive" : "False"      
+},
+{
+    "name" : "xErrorCh4",
+    "ID" : 28,
+    "opc_adr" : "GVL_Termodat.TERMODAT[4].xError",
+        "scale" : "TwoState",
+    "isArchive" : "False"      
 }
 ]

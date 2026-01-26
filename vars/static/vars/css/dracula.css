@@ -260,8 +260,11 @@ hr {
   color: var(--dracula-foreground);
 
 }
+.state-alarm {
+  color: var(--dracula-red);
 
-.state-true {
+}
+.state-true, .state-normal {
   color: var(--dracula-green);
 }
 
@@ -294,18 +297,18 @@ hr {
 
 
 .user-info {
-
-    background-color: var(--dracula-green);    
+   
     font-size: 14px;
     width: 250px;
     text-align: center;          /* Дополнительно для текста */ 
     border-radius: 4px;  
-    color: var(--dracula-background);
-    border-radius: 4px;
     font-size: 1rem;
     transition: background-color 0.3s, transform 0.1s;
     width: 250px;
-    height: 45px;    
+    height: 45px;
+    border-width:medium;
+    border-color:var(--dracula-green);
+    border-style:solid;         
 }
 
 /* Классы для акцентов */

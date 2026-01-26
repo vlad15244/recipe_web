@@ -173,7 +173,7 @@ class OpcUaConsumer(AsyncWebsocketConsumer):
             try:
                 data = await asyncio.to_thread(var_list.list_json_with_Unit)
                 await self.send(data)
-                await asyncio.sleep(0.05)
+                await asyncio.sleep(0.5)
             except Exception as e:
                 logger.error(f"Ошибка данных: {e}")
                 await asyncio.sleep(1)  # Пауза перед повторной попыткой
@@ -286,20 +286,15 @@ class OpcUaConsumer(AsyncWebsocketConsumer):
                     for res in result:
                         records_to_create.append(
                             Message(
-                                id_var=res[0],
-                                value=res[1],
-                                timestamp=res[2]
+                                id_message=res[0],
+                                message=res[1],
+                                timestamp=timezone.now()
                             )
                         )
-
-        # Сохраняем в БД
-        await sync_to_async(Trends.objects.bulk_create)(records_to_create)                        
-
+                    # Сохраняем в БД
+                    await sync_to_async(Message.objects.bulk_create)(records_to_create)                        
                     current_value = new_value
-
-                    # сохраняем в модель
-
-
+                                # сохраняем в модель
 
                 await asyncio.sleep(1)      
 
