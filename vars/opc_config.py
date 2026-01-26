@@ -30,7 +30,10 @@ class VariablePLC:
 
     def str_unit(self):
         try:
-            return str(f"{self.plc.client.get_node(self.opc_adr).get_value()} {self.scale.unit}")
+            if self.scale.unit:
+                return str(f"{self.plc.client.get_node(self.opc_adr).get_value()} {self.scale.unit}")
+            else:
+                return str(f"{self.plc.client.get_node(self.opc_adr).get_value()}")
         except Exception as e:
             return ""
 
