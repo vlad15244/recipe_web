@@ -10,7 +10,6 @@
     <label for="start_date">Дата:</label>
     <input type="date" class="btn" name="start_date" value="{{ request.GET.start_date }}">
     <button type="submit" class="input">Искать</button>
-    <a href="{% url 'trends_month' %}" class="btn btn-secondary">За текущий месяц</a>    
 </form>
 
 
@@ -26,7 +25,7 @@
             </tr>
         </thead>
         <tbody>
-            {% for trend in trends %}
+            {% for trend in trends_month %}
             <tr>
             <td>{{ trend.0 }}</td>                
             <td>{{ trend.1 }}</td>

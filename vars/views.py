@@ -3,6 +3,8 @@ from django.contrib.auth import authenticate, login
 from django.template import loader
 from django.http import HttpResponse
 from django.conf import settings
+from django.views.generic.list import ListView
+from django.utils import timezone
 
 from .models import Recipe, Trends, Message
 from .forms import RecipeForm, LoginForm
@@ -19,6 +21,31 @@ def index(request):
 
 def opcua_realtime(request):
     return render(request, 'vars/realtime.html')
+
+
+class TrendsCurrentMonth(ListView):
+    model = Trends
+    template_name = 'vars/trends_month.html'
+    context_object_name = 'trends_month'
+
+    def get_queryset(self):
+        now = timezone.now()
+        
+        return Trends.objects.filter(
+                                    timestamp__month = now.month, timestamp__year = now.year)
+    
+    
+    def get_context_data(self, **kwargs):
+        self.query_set = self.get_queryset()
+
+        trends = convert_buffer(self.query_set)
+        
+        context = {
+            'trends_month': trends,
+            'has_data': len(trends) > 0  # флаг наличия данных
+        }
+        return context
+        
 
 def add_recipe(request):
     if request.method == 'POST':
@@ -58,6 +85,9 @@ def trends(request):
 
     template = loader.get_template('vars/trends.html')
     return HttpResponse(template.render(context, request)) 
+
+
+
 
 def user_login(request):
     if request.method == 'POST':
