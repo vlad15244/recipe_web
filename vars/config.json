@@ -201,5 +201,12 @@
     "opc_adr" : "GVL_Termodat.TERMODAT[4].xError",
         "scale" : "TwoState",
     "isArchive" : "False"      
+},
+{
+    "name" : "Recipe_ID",
+    "ID" : 29,
+    "opc_adr" : "GVL_Recipe.number",
+        "scale" : "TwoState",
+    "isArchive" : "False"      
 }
 ]

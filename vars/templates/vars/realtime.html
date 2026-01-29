@@ -9,8 +9,13 @@
   </div>
                 
 <button id="onclick" onclick="handleClick()">Вкл/выкл нагрев</button>
-<h3>Уставка</h3>
-<input id="setpoint" type="number" min="0" max="800">
+<h2>Текущие параметры процесса</h2>
+  <div class="recipe_container" id = "recipe_value">
+  <p class="recipe_id"></p> 
+  <p class="recipe_name"></p>     
+  </div>
+
+
 
 <script src="{% static 'vars/js/socket.js' %}" defer></script>  
 

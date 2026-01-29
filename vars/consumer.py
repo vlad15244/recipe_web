@@ -66,6 +66,7 @@ def write(value, name):
 
 def recipe_save(recipe):
     try:
+        var_list.get_variable_by_Name("Recipe_ID").value = recipe.pk
         var_list.get_variable_by_Name("Recipe_v1").value = recipe.var1
         var_list.get_variable_by_Name("Recipe_v2").value = recipe.var2
         var_list.get_variable_by_Name("Recipe_v3").value = recipe.var3
@@ -156,7 +157,6 @@ class OpcUaConsumer(AsyncWebsocketConsumer):
 
         self.message_buffer = asyncio.create_task(self.message_clock())
 
-
     async def disconnect(self, close_code):
         logger.info(f"WebSocket закрыт. Код: {close_code}")
         if self.task:
@@ -217,7 +217,11 @@ class OpcUaConsumer(AsyncWebsocketConsumer):
         elif (json.loads(message)).get("action") == "recipe":
             try:
                 id_recipe = int((json.loads(message)).get("ID"))
+                print(id_recipe)
+                print(type(id_recipe))
+
                 recipe = await sync_to_async(Recipe.objects.get)(pk=id_recipe)
+
                 recipe_save(recipe)
 
             except Exception as e:
@@ -252,36 +256,37 @@ class OpcUaConsumer(AsyncWebsocketConsumer):
 
     async def message_clock(self):
 
-        await asyncio.sleep(1) 
+        await asyncio.sleep(1)
 
         try:
             variable = var_list.get_variable_by_ID(24)
             if variable is None:
-                logger.info(f"Ошибка")   
+                logger.info(f"Ошибка")
 
-            current_value =  variable.AsInt()            
+            current_value = variable.AsInt()
 
             logger.info(f"Начальное значение Error1: {current_value}")
 
         except Exception as e:
-            logger.error(f"Ошибка при получении начального значения Error1: {e}")
+            logger.error(
+                f"Ошибка при получении начального значения Error1: {e}")
 
-        
         while True:
 
             try:
                 variable = var_list.get_variable_by_ID(24)
 
                 if variable is None:
-                    logger.info(f"Ошибка")   
+                    logger.info(f"Ошибка")
                     await asyncio.sleep(5)
                     continue
 
                 new_value = variable.AsInt()
-                
+
                 if new_value != current_value:
                     """ делаем здесь, что надо"""
-                    result = message_handler.error_handling(data_message, variable)
+                    result = message_handler.error_handling(
+                        data_message, variable)
                     records_to_create = []
                     for res in result:
                         records_to_create.append(
@@ -292,11 +297,11 @@ class OpcUaConsumer(AsyncWebsocketConsumer):
                             )
                         )
                     # Сохраняем в БД
-                    await sync_to_async(Message.objects.bulk_create)(records_to_create)                        
+                    await sync_to_async(Message.objects.bulk_create)(records_to_create)
                     current_value = new_value
-                                # сохраняем в модель
+                    # сохраняем в модель
 
-                await asyncio.sleep(1)      
+                await asyncio.sleep(1)
 
             except Exception as e:
                 logger.error(f"Ошибка сохранения сообщений: {e}")

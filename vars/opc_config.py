@@ -46,7 +46,7 @@ class VariablePLC:
             new = float(new)
         elif variant_type == ua.VariantType.Double:
             new = float(new)
-        elif variant_type in (ua.VariantType.Int16, ua.VariantType.Int32, ua.VariantType.UInt32):
+        elif variant_type in (ua.VariantType.Int16, ua.VariantType.Int32, ua.VariantType.UInt32, ua.VariantType.UInt16):
             new = int(new)
         elif variant_type == ua.VariantType.String:
             new = str(new)

@@ -51,6 +51,7 @@ function updateTable(data) {
 }
 
 const socket = new WebSocket('ws://localhost:8001/ws/opcua/');
+const cont_recipe = document.getElementById('recipe_value');
 
 window.socket = socket;
 
@@ -61,6 +62,15 @@ socket.onmessage = function(event) {
     updateTable(data);
     btState(data.xRegul);
     visible_btn(data.xVisible);
+    visibleRecipe(data.Recipe_ID, cont_recipe);
+    const recipeIdElement = document.querySelector('.recipe_id');
+  if (recipeIdElement) {
+    recipeIdElement.textContent = 'ID:' + ' ' + data.Recipe_ID; 
+  }
+ const recipeNameElement = document.querySelector('.recipe_name');
+  if (recipeNameElement) {
+    recipeNameElement.textContent = 'Наименование:' + ' ' + data.Recipe_Name;      
+  }
   } catch (error) {
     console.error('Ошибка парсинга JSON:', error, 'Данные:', event.data);
   }
@@ -80,6 +90,20 @@ function formatCh(value) {
   } else {
     return 'Авария';
   }
+}
+
+
+function visibleRecipe(value, container){
+  const Val = Number(value);
+  if (!isNaN(Val) && Val > 0){
+    container.style.visibility = 'visible';
+
+
+  } else
+  {
+    container.style.visibility = 'hidden';    
+  }
+
 }
 
 function colorState(value, cell) {
@@ -156,16 +180,6 @@ function visible_btn(value) {
     btn.style.visibility = 'visible';
   }
 }
-
-const input = document.getElementById('setpoint');
-input.addEventListener('input', function() {
-  const command = {
-    action: "setpoint",
-    value: Number(this.value)
-  };
-  window.socket.send(JSON.stringify(command));
-});
-
 
 
 

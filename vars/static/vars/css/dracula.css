@@ -296,6 +296,28 @@ hr {
 }
 
 
+.recipe_container  {
+   
+    font-size: 14px;
+    width: 250px;
+    border-radius: 4px;  
+    font-size: 1rem;
+    transition: background-color 0.3s, transform 0.1s;
+    display: flex;
+    flex-direction: column; 
+    gap: 10px; 
+    width: 250px;
+    height: 60px;
+    border-width:medium;
+    border-color:var(--dracula-green);
+    border-style:solid;         
+}
+
+.recipe_id,
+.recipe_name {
+  margin: 0;
+}
+
 .user-info {
    
     font-size: 14px;
