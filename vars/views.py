@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login
+from django.contrib.auth.decorators import login_required
 from django.template import loader
 from django.http import HttpResponse
 from django.conf import settings
@@ -12,6 +13,8 @@ from datetime import datetime, date
 from .convert import convert_buffer
 from xhtml2pdf import pisa 
 
+
+@login_required
 def index(request):
     template = loader.get_template('vars/index.html')
     recipes = Recipe.objects.order_by('-created_at')
