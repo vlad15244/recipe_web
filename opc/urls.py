@@ -28,5 +28,6 @@ urlpatterns = [
     path('trends_month/', views.TrendsCurrentMonth.as_view(), name='trends_month'),    
     path('login/', views.user_login, name='login'),
     path('trends_pdf/', views.trends_pdf, name='trends_pdf'), 
-    path('message/', views.message, name='message'),                   
+    path('message/', views.message, name='message'), 
+    path('message_month/', views.MessageCurrentMonth.as_view(), name='message_month'),                       
 ]

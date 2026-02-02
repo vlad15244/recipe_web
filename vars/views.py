@@ -45,7 +45,30 @@ class TrendsCurrentMonth(ListView):
             'has_data': len(trends) > 0  # флаг наличия данных
         }
         return context
+
+class MessageCurrentMonth(ListView):
+    model = Message
+    template_name = 'vars/message_month.html'
+    context_object_name = 'message_month'
+
+    def get_queryset(self):
+        now = timezone.now()
         
+        return Message.objects.filter(
+                                    timestamp__month = now.month, timestamp__year = now.year)
+    
+    
+    def get_context_data(self, **kwargs):
+        self.query_set = self.get_queryset()
+
+        messages = self.query_set
+        
+        context = {
+            'messages': messages,
+            'has_data': len(messages) > 0  # флаг наличия данных
+        }
+        return context
+
 
 def add_recipe(request):
     if request.method == 'POST':
