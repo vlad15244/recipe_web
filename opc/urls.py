@@ -31,5 +31,6 @@ urlpatterns = [
     path('logout/', auth_views.LogoutView.as_view(template_name='registration/logout.html', next_page = 'login'), name='logout'),    
     path('trends_pdf/', views.trends_pdf, name='trends_pdf'), 
     path('message/', views.message, name='message'), 
-    path('message_month/', views.MessageCurrentMonth.as_view(), name='message_month'),                       
+    path('message_month/', views.MessageCurrentMonth.as_view(), name='message_month'), 
+    path('recipes/<int:recipe_id>/', views.one_recipe, name='recipe'),                           
 ]

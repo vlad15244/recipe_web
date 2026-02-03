@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Выбранный рецепт{% endblock %}
+{% block content %}
+
+
+            <h1>Выбранный рецепт</h1>                
+            <h2>Наименование: {{ recipe.name }}</h2>
+            <p>Создан : {{recipe.created_at|date:"Y-m-d H:i:s"}} </p>
+            <p>Параметр 1 : {{recipe.var1}} </p>            
+            <p>Параметр 2 : {{recipe.var2}} </p> 
+            <p>Параметр 3 : {{recipe.var3}} </p>             
+{% endblock %}

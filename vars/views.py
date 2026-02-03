@@ -22,6 +22,12 @@ def index(request):
     return HttpResponse(template.render(context, request))
 # Create your views here.
 
+def one_recipe(request, recipe_id):
+    recipe = Recipe.objects.get(pk=recipe_id)
+    context = {'recipe': recipe}
+    return render(request, 'vars/recipe.html', context) 
+
+
 def opcua_realtime(request):
     return render(request, 'vars/realtime.html')
 
