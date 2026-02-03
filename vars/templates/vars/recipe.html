@@ -9,5 +9,7 @@
             <p>Создан : {{recipe.created_at|date:"Y-m-d H:i:s"}} </p>
             <p>Параметр 1 : {{recipe.var1}} </p>            
             <p>Параметр 2 : {{recipe.var2}} </p> 
-            <p>Параметр 3 : {{recipe.var3}} </p>             
+            <p>Параметр 3 : {{recipe.var3}} </p> 
+<a href="{% url 'recipe_list' %}" class="btn">Назад</a>                   
 {% endblock %}
+

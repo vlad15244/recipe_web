@@ -10,9 +10,15 @@ table.addEventListener('click', function(event) {
         const rowIndex = row.rowIndex; // Индекс строки
         const cellIndex = cell.cellIndex; // Индекс ячейки
         const cellContent = cell.textContent; // Содержимое ячейки
+        const url = row.getAttribute('data-id');
 
         ID = row.cells[0].textContent;
         visible_btn(ID)
+
+        //Кнопка Просмотр
+        const btn_show = document.querySelector('.btn_show');
+        btn_show.href = String(ID);
+        visible_btn_show(ID);
         //recipe_save(ID, socket);
         console.log(`Клик по ячейке: Строка ${rowIndex}, Столбец ${cellIndex}, Содержимое: ${cellContent}`);
 
@@ -58,12 +64,27 @@ function visible_btn(value) {
 
 }
 
+function visible_btn_show(value) {
+  const btn = document.querySelector('.btn_show');
+  const Val = Number(value);
+
+  if (!isNaN(Val) && Val > 0){
+    btn.style.visibility = 'visible';
+  } else
+  {
+    btn.style.visibility = 'hidden';    
+  }
+
+}
+
+
 window.addEventListener('beforeunload', () => {
   socket.close();
 });
 
 document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('onsave').style.visibility = 'hidden';
+    document.querySelector('.btn_show').style.visibility = 'hidden';
 });
 
 
