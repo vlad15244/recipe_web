@@ -53,7 +53,7 @@ a:hover {
 
 /* Кнопки */
 button,
-a.btn, a.btn_show {
+a.btn, a.btn_show, a.btn_edit {
   background-color: var(--dracula-green);
   color: var(--dracula-background);
   border: none;

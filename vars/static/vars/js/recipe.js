@@ -10,17 +10,23 @@ table.addEventListener('click', function(event) {
         const rowIndex = row.rowIndex; // Индекс строки
         const cellIndex = cell.cellIndex; // Индекс ячейки
         const cellContent = cell.textContent; // Содержимое ячейки
-        const url = row.getAttribute('data-id');
 
         ID = row.cells[0].textContent;
         visible_btn(ID)
 
         //Кнопка Просмотр
         const btn_show = document.querySelector('.btn_show');
+        console.log(`Клик по ${btn_show.href}`);
         btn_show.href = String(ID);
+        const btn_edit = document.querySelector('.btn_edit');
+        console.log(`Клик по ${btn_edit.href}`);
+        btn_edit.href = String(ID) + "/edit/";        
         visible_btn_show(ID);
+        visible_btn_edit(ID); 
+
         //recipe_save(ID, socket);
         console.log(`Клик по ячейке: Строка ${rowIndex}, Столбец ${cellIndex}, Содержимое: ${cellContent}`);
+
 
     }
 });
@@ -46,9 +52,6 @@ function recipe_save(data, socket) {
 
   saveBtn.style.visibility = 'hidden';  
 }
-
-
-
 
 
 function visible_btn(value) {
@@ -77,6 +80,18 @@ function visible_btn_show(value) {
 
 }
 
+function visible_btn_edit(value) {
+  const btn = document.querySelector('.btn_edit');
+  const Val = Number(value);
+
+  if (!isNaN(Val) && Val > 0){
+    btn.style.visibility = 'visible';
+  } else
+  {
+    btn.style.visibility = 'hidden';    
+  }
+
+}
 
 window.addEventListener('beforeunload', () => {
   socket.close();
@@ -85,6 +100,7 @@ window.addEventListener('beforeunload', () => {
 document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('onsave').style.visibility = 'hidden';
     document.querySelector('.btn_show').style.visibility = 'hidden';
+    document.querySelector('.btn_edit').style.visibility = 'hidden';    
 });
 
 

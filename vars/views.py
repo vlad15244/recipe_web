@@ -1,6 +1,5 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login
-from django.contrib.auth.decorators import login_required
 from django.template import loader
 from django.http import HttpResponse
 from django.conf import settings
@@ -9,12 +8,12 @@ from django.utils import timezone
 
 from .models import Recipe, Trends, Message
 from .forms import RecipeForm, LoginForm
+
 from datetime import datetime, date
 from .convert import convert_buffer
 from xhtml2pdf import pisa 
 
 
-@login_required
 def index(request):
     template = loader.get_template('vars/index.html')
     recipes = Recipe.objects.order_by('-created_at')
@@ -22,6 +21,22 @@ def index(request):
     return HttpResponse(template.render(context, request))
 # Create your views here.
 
+
+def recipe_edit(request, pk):
+    instance = get_object_or_404(Recipe, pk=pk)
+
+    if request.method == "POST":
+
+        form = RecipeForm(request.POST, instance=instance)
+        print('request.method')
+        if form.is_valid():
+            form.save()
+            return redirect('recipes')
+    else:
+        form = RecipeForm(instance=instance)
+
+    return render(request, 'vars/edit.html', {'form':form}) 
+        
 def one_recipe(request, recipe_id):
     recipe = Recipe.objects.get(pk=recipe_id)
     context = {'recipe': recipe}
@@ -80,11 +95,12 @@ class MessageCurrentMonth(ListView):
 
 
 def add_recipe(request):
+    print('this is new')
     if request.method == 'POST':
         form = RecipeForm(request.POST)
         if form.is_valid():
             form.save()
-            return redirect('recipe_list')
+            return redirect('recipe')
     else:
         form = RecipeForm()
     
