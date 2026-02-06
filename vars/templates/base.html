@@ -21,10 +21,10 @@
             <div class="user-info">
                 {% if user.is_authenticated %}
                     Пользователь: {{ user.username }}!  
-                {% endif %}
                 <form method="post" action="{% url 'logout' %}">
                 {% csrf_token %}
                 <button type="submit">Выйти</button>
+                {% endif %}
             </div>        
         </div> 
         <div id="content">

@@ -25,7 +25,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('recipes/<int:pk>/edit/', views.recipe_edit, name='edit'),
     path('recipes/<int:recipe_id>/', views.one_recipe, name='recipe'),    
-    path('recipes/', include('vars.urls'), name='recipe'),
+    path('recipes/', include('vars.urls'), name='recipe_list'),
     path('realtime/', views.opcua_realtime, name='realtime'),
     path('trends/', views.trends, name='trends'),
     path('trends_month/', views.TrendsCurrentMonth.as_view(), name='trends_month'),    

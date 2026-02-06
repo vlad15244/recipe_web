@@ -31,7 +31,7 @@ def recipe_edit(request, pk):
         print('request.method')
         if form.is_valid():
             form.save()
-            return redirect('recipes')
+            return redirect('recipe_list')
     else:
         form = RecipeForm(instance=instance)
 
@@ -95,7 +95,7 @@ class MessageCurrentMonth(ListView):
 
 
 def add_recipe(request):
-    print('this is new')
+
     if request.method == 'POST':
         form = RecipeForm(request.POST)
         if form.is_valid():
