@@ -10,8 +10,7 @@
     <label for="start_date">Дата:</label>
     <input type="date" class="btn" name="start_date" value="{{ request.GET.start_date }}">
     <button type="submit" class="input">Искать</button>
-    <a href="{% url 'trends_month' %}" class="btn btn-secondary">За текущий месяц</a>
-    <a href="{% url 'trends_month_aggregate' %}" class="btn btn-secondary">Агрегатные значения</a>     
+    <a href="{% url 'trends_month' %}" class="btn btn-secondary">За текущий месяц</a>    
 </form>
 
 
@@ -27,7 +26,7 @@
             </tr>
         </thead>
         <tbody>
-            {% for trend in trends_month_aggregate %}
+            {% for trend in trends %}
             <tr>
             <td>{{ trend.0 }}</td>                
             <td>{{ trend.1 }}</td>
@@ -37,19 +36,14 @@
             </tr>
             {% endfor %}
         </tbody>
-        </table>
-        <a 
-            class="btn btn-primary"
-            href="{% url 'trends_pdf' %}?start_date={{ selected_date }}"
-            target="_blank"
-        >
-            Download as PDF
-        </a>       
+        </table>      
     {% else %}
         <div class="no-data">
             <p>Нет данный за выбранный период</p>
         </div>          
     {% endif %}
 
+
+<!-- Кнопка для скачивания PDF -->
 
 {% endblock %}

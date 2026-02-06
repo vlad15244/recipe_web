@@ -5,13 +5,14 @@ from django.http import HttpResponse
 from django.conf import settings
 from django.views.generic.list import ListView
 from django.utils import timezone
+from django.db.models import Avg
 
 from .models import Recipe, Trends, Message
 from .forms import RecipeForm, LoginForm
 
 from datetime import datetime, date
 from .convert import convert_buffer
-from xhtml2pdf import pisa 
+from xhtml2pdf import pisa
 
 
 def index(request):
@@ -35,12 +36,13 @@ def recipe_edit(request, pk):
     else:
         form = RecipeForm(instance=instance)
 
-    return render(request, 'vars/edit.html', {'form':form}) 
-        
+    return render(request, 'vars/edit.html', {'form': form})
+
+
 def one_recipe(request, recipe_id):
     recipe = Recipe.objects.get(pk=recipe_id)
     context = {'recipe': recipe}
-    return render(request, 'vars/recipe.html', context) 
+    return render(request, 'vars/recipe.html', context)
 
 
 def opcua_realtime(request):
@@ -54,21 +56,50 @@ class TrendsCurrentMonth(ListView):
 
     def get_queryset(self):
         now = timezone.now()
-        
+
         return Trends.objects.filter(
-                                    timestamp__month = now.month, timestamp__year = now.year)
-    
-    
+            timestamp__month=now.month, timestamp__year=now.year)
+
     def get_context_data(self, **kwargs):
         self.query_set = self.get_queryset()
 
         trends = convert_buffer(self.query_set)
-        
+
         context = {
             'trends_month': trends,
             'has_data': len(trends) > 0  # флаг наличия данных
         }
         return context
+
+
+class TrendsAggregateMonth(ListView):
+    model = Trends
+    template_name = 'vars/trends_aggregate.html'
+    context_object_name = 'trends_month_aggregate'
+
+    def get_queryset(self):
+        now = timezone.now()
+        aggregate = []
+
+
+        for i in range(1, 5):
+            aggregate.append(Trends.objects.filter(
+                                                    timestamp__month=now.month, timestamp__year=now.year, id_var=i).aggregate(Avg('value')))
+
+        print(aggregate)
+        return aggregate
+
+    def get_context_data(self, **kwargs):
+
+        trends = self.get_queryset()
+
+        context = {
+            'trends_month_aggregate': trends,
+            'has_data': len(trends) > 0  # флаг наличия данных
+        }
+
+        return context
+
 
 class MessageCurrentMonth(ListView):
     model = Message
@@ -77,16 +108,15 @@ class MessageCurrentMonth(ListView):
 
     def get_queryset(self):
         now = timezone.now()
-        
+
         return Message.objects.filter(
-                                    timestamp__month = now.month, timestamp__year = now.year)
-    
-    
+            timestamp__month=now.month, timestamp__year=now.year)
+
     def get_context_data(self, **kwargs):
         self.query_set = self.get_queryset()
 
         messages = self.query_set
-        
+
         context = {
             'messages': messages,
             'has_data': len(messages) > 0  # флаг наличия данных
@@ -103,8 +133,9 @@ def add_recipe(request):
             return redirect('recipe')
     else:
         form = RecipeForm()
-    
-    return render(request, 'vars/add_recipe.html', {'form':form})
+
+    return render(request, 'vars/add_recipe.html', {'form': form})
+
 
 def trends(request):
 
@@ -114,17 +145,17 @@ def trends(request):
     buffer = []
     for trend in trends:
         buffer.append(trend)
-        
+
     if date_str:
         try:
             date_time = datetime.strptime(date_str, '%Y-%m-%d').date()
 
             trends = convert_buffer(Trends.objects.filter(
-                                            timestamp__date = date_time))
+                timestamp__date=date_time))
 
         except ValueError:
             pass
-            
+
     context = {
         'trends': trends,
         'selected_date': date_str,
@@ -132,9 +163,7 @@ def trends(request):
     }
 
     template = loader.get_template('vars/trends.html')
-    return HttpResponse(template.render(context, request)) 
-
-
+    return HttpResponse(template.render(context, request))
 
 
 def user_login(request):
@@ -142,8 +171,9 @@ def user_login(request):
         form = LoginForm(request.POST)
         if form.is_valid():
             cd = form.cleaned_data
-            user = authenticate(request, username=cd['username'], password=cd['password'])
-            
+            user = authenticate(
+                request, username=cd['username'], password=cd['password'])
+
             # Проверка user теперь ВНУТРИ блока is_valid()
             if user is not None:
                 if user.is_active:
@@ -152,9 +182,10 @@ def user_login(request):
             else:
                 pass
     else:
-        form = LoginForm()    
+        form = LoginForm()
 
-    return render(request, 'vars/login.html', {'form': form})  
+    return render(request, 'vars/login.html', {'form': form})
+
 
 def trends_pdf(request):
     # Получаем дату из GET-параметра
@@ -164,7 +195,7 @@ def trends_pdf(request):
         try:
             date_time = datetime.strptime(date_str, '%Y-%m-%d').date()
         except ValueError:
-            date_time = None #Если ошибка, просто скажем сегодня
+            date_time = None  # Если ошибка, просто скажем сегодня
     else:
         date_time = date.today()
 
@@ -177,7 +208,6 @@ def trends_pdf(request):
     trends_list = list(trends_queryset)
     trends = convert_buffer(trends_list)
 
-
     # Подготавливаем контекст для шаблона PDF
     context = {
         'base_dir': settings.BASE_DIR,  # Передаем путь к проекту
@@ -189,7 +219,6 @@ def trends_pdf(request):
     # Загружаем шаблон для PDF
     template = loader.get_template('vars/trends_pdf.html')
     html = template.render(context)
-
 
     # Генерируем PDF
     response = HttpResponse(content_type='application/pdf')
@@ -213,11 +242,11 @@ def message(request):
             date_time = datetime.strptime(date_str, '%Y-%m-%d').date()
 
             messages = Message.objects.filter(
-                                            timestamp__date = date_time)
+                timestamp__date=date_time)
 
         except ValueError:
             pass
-            
+
     context = {
         'messages': messages,
         'selected_date': date_str,
@@ -225,4 +254,4 @@ def message(request):
     }
     print(messages)
     template = loader.get_template('vars/message.html')
-    return HttpResponse(template.render(context, request)) 
+    return HttpResponse(template.render(context, request))
