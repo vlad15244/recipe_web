@@ -5,7 +5,7 @@ from django.http import HttpResponse
 from django.conf import settings
 from django.views.generic.list import ListView
 from django.utils import timezone
-from django.db.models import Avg
+from django.db.models import Avg,Max,Sum
 
 from .models import Recipe, Trends, Message
 from .forms import RecipeForm, LoginForm
@@ -79,31 +79,51 @@ class TrendsAggregateMonth(ListView):
     context_object_name = 'trends_month_aggregate'
 
     def get_queryset(self):
-        start_date = self.request.get('start_date')
+        start_date = self.request.GET.get('start_date')
 
         if start_date:
-
-            aggregate = []
-
-
+            date_time = datetime.strptime(start_date, '%Y-%m-%d').date()
+            aggregate = {}
+            avg = []
+            max = []
+            sum = []
             for i in range(1, 5):
-                aggregate.append(Trends.objects.filter(
-                                                        timestamp__month=start_date.month, timestamp__year=start_date.year, id_var=i).aggregate(Avg('value')))
+                avg.append(Trends.objects.filter(
+                                                        timestamp__month=date_time.month, timestamp__year=date_time.year, id_var=i).aggregate(Avg('value')))
+            for i in range(1, 5):
+                max.append(Trends.objects.filter(
+                                                        timestamp__month=date_time.month, timestamp__year=date_time.year, id_var=i).aggregate(Max('value')))
+            for i in range(1, 5):
+                sum.append(Trends.objects.filter(
+                                                        timestamp__month=date_time.month, timestamp__year=date_time.year, id_var=i).aggregate(Sum('value')))                
+                
+            aggregate["avg"] = avg
+            aggregate["max"] = max
+            aggregate["sum"] = sum                        
 
-            print(aggregate)
             return aggregate
 
     def get_context_data(self, **kwargs):
 
         trends = self.get_queryset()
+        print(trends)
 
-        context = {
-            'trends_month_aggregate': trends,
-            'has_data': len(trends) > 0  # флаг наличия данных
-        }
+
+        if trends:
+
+            context = {
+                'trends_month_aggregate': trends,
+                'has_data': len(trends) > 0  # флаг наличия данных
+            }
+
+        
+        else:
+
+            context = {
+                'has_data': False  # флаг наличия данных
+            }
 
         return context
-
 
 class MessageCurrentMonth(ListView):
     model = Message

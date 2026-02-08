@@ -16,26 +16,34 @@
 
     {% if has_data %}
         <table class="trends-table">
-        <thead>
-            <tr>
-            <th>Время</th>
-            <th>PV1</th>
-            <th>PV2</th> 
-            <th>PV3</th>
-            <th>PV4</th>                        
-            </tr>
-        </thead>
-        <tbody>
-            {% for trend in trends %}
-            <tr>
-            <td>{{ trend.0 }}</td>                
-            <td>{{ trend.1 }}</td>
-            <td>{{ trend.2 }}</td>
-            <td>{{ trend.3 }}</td>
-            <td>{{ trend.4 }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
+            <thead>
+                <tr>
+                    <th>Показатель</th>
+                    {% for trends in trends_month_aggregate.avg  %}
+                        <th>PV{{ forloop.counter }}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Среднее</td>
+                    {% for trends in trends_month_aggregate.avg %}
+                        <td>{{ trends.value__avg|floatformat:2 }}</td>
+                    {% endfor %}
+                </tr>
+                <tr>
+                    <td>Максимальное</td>
+                    {% for trends in trends_month_aggregate.max %}
+                        <td>{{ trends.value__max|floatformat:2 }}</td>
+                    {% endfor %}
+                </tr>
+                <tr>
+                    <td>Сумма</td>
+                    {% for trends in trends_month_aggregate.sum %}
+                        <td>{{ trends.value__sum|floatformat:2 }}</td>
+                    {% endfor %}
+                </tr>
+            </tbody>
         </table>      
     {% else %}
         <div class="no-data">
