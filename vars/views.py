@@ -73,21 +73,25 @@ class TrendsCurrentMonth(ListView):
 
 
 class TrendsAggregateMonth(ListView):
+
     model = Trends
     template_name = 'vars/trends_aggregate.html'
     context_object_name = 'trends_month_aggregate'
 
     def get_queryset(self):
-        now = timezone.now()
-        aggregate = []
+        start_date = self.request.get('start_date')
+
+        if start_date:
+
+            aggregate = []
 
 
-        for i in range(1, 5):
-            aggregate.append(Trends.objects.filter(
-                                                    timestamp__month=now.month, timestamp__year=now.year, id_var=i).aggregate(Avg('value')))
+            for i in range(1, 5):
+                aggregate.append(Trends.objects.filter(
+                                                        timestamp__month=start_date.month, timestamp__year=start_date.year, id_var=i).aggregate(Avg('value')))
 
-        print(aggregate)
-        return aggregate
+            print(aggregate)
+            return aggregate
 
     def get_context_data(self, **kwargs):
 

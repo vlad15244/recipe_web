@@ -11,7 +11,7 @@
     <input type="date" class="btn" name="start_date" value="{{ request.GET.start_date }}">
     <button type="submit" class="input">Искать</button>
     <a href="{% url 'trends_month' %}" class="btn btn-secondary">За текущий месяц</a>
-    <a href="{% url 'trends_month_aggregate' %}" class="btn btn-secondary">Агрегатные значения</a>     
+    <a href="{% url 'trends_month_aggregate' %}?start_date={{ request.GET.start_date }}" class="btn btn-secondary">Агрегатные значения</a>     
 </form>
 
 
