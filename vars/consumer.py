@@ -14,7 +14,7 @@ from queue import Queue
 
 
 # Буффер для архива
-plc_buffer = Queue(maxsize=20)
+plc_buffer = Queue(maxsize=5)
 
 logger = logging.getLogger(__name__)
 
@@ -77,8 +77,6 @@ def recipe_save(recipe):
 
 
 """"""
-
-
 async def save_to_buffer():
     """  
         формируем буффер по всем данным, у которых стоит is_archived True, 
@@ -92,6 +90,7 @@ async def save_to_buffer():
                     plc_buffer.put([var.ID, float(var.value), timezone.now()])
 
             if plc_buffer.full():
+                print(plc_buffer)
                 logger.warning(
                     "Буфер переполнен. Отбрасываем новые данные.")
                 await flush_buffer_to_db()
@@ -130,7 +129,7 @@ async def flush_buffer_to_db():
 
         # Сохраняем в БД
         await sync_to_async(Trends.objects.bulk_create)(records_to_create)
-        print('Буффер сохранен')
+
         logger.info(f"Сохранено {len(records_to_create)} записей в БД.")
 
     except Exception as e:
@@ -218,8 +217,7 @@ class OpcUaConsumer(AsyncWebsocketConsumer):
         elif (json.loads(message)).get("action") == "recipe":
             try:
                 id_recipe = int((json.loads(message)).get("ID"))
-                print(id_recipe)
-                print(type(id_recipe))
+
 
                 recipe = await sync_to_async(Recipe.objects.get)(pk=id_recipe)
 
