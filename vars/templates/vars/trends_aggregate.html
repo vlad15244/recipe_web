@@ -19,7 +19,7 @@
             <thead>
                 <tr>
                     <th>Показатель</th>
-                    {% for trends in trends_month_aggregate.avg  %}
+                    {% for trends in trends_month_aggregate.data  %}
                         <th>PV{{ forloop.counter }}</th>
                     {% endfor %}
                 </tr>
@@ -27,20 +27,26 @@
             <tbody>
                 <tr>
                     <td>Среднее</td>
-                    {% for trends in trends_month_aggregate.avg %}
+                    {% for trends in trends_month_aggregate.data %}
                         <td>{{ trends.value__avg|floatformat:2 }}</td>
                     {% endfor %}
                 </tr>
                 <tr>
                     <td>Максимальное</td>
-                    {% for trends in trends_month_aggregate.max %}
+                    {% for trends in trends_month_aggregate.data %}
                         <td>{{ trends.value__max|floatformat:2 }}</td>
                     {% endfor %}
                 </tr>
                 <tr>
                     <td>Сумма</td>
-                    {% for trends in trends_month_aggregate.sum %}
+                    {% for trends in trends_month_aggregate.data %}
                         <td>{{ trends.value__sum|floatformat:2 }}</td>
+                    {% endfor %}
+                </tr>
+                <tr>
+                    <td>Минимальное</td>
+                    {% for trends in trends_month_aggregate.data %}
+                        <td>{{ trends.value__min|floatformat:2 }}</td>
                     {% endfor %}
                 </tr>
             </tbody>

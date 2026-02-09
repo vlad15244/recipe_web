@@ -5,7 +5,7 @@ from django.http import HttpResponse
 from django.conf import settings
 from django.views.generic.list import ListView
 from django.utils import timezone
-from django.db.models import Avg,Max,Sum
+from django.db.models import Avg,Max,Sum,Min
 
 from .models import Recipe, Trends, Message
 from .forms import RecipeForm, LoginForm
@@ -84,30 +84,18 @@ class TrendsAggregateMonth(ListView):
         if start_date:
             date_time = datetime.strptime(start_date, '%Y-%m-%d').date()
             aggregate = {}
-            avg = []
-            max = []
-            sum = []
-            for i in range(1, 5):
-                avg.append(Trends.objects.filter(
-                                                        timestamp__month=date_time.month, timestamp__year=date_time.year, id_var=i).aggregate(Avg('value')))
-            for i in range(1, 5):
-                max.append(Trends.objects.filter(
-                                                        timestamp__month=date_time.month, timestamp__year=date_time.year, id_var=i).aggregate(Max('value')))
-            for i in range(1, 5):
-                sum.append(Trends.objects.filter(
-                                                        timestamp__month=date_time.month, timestamp__year=date_time.year, id_var=i).aggregate(Sum('value')))                
-                
-            aggregate["avg"] = avg
-            aggregate["max"] = max
-            aggregate["sum"] = sum                        
+            data = []
 
+            for i in range(1, 5):
+                data.append(Trends.objects.filter(
+                                                        timestamp__month=date_time.month, timestamp__year=date_time.year, id_var=i).aggregate(Avg('value'),Max('value'), Min('value'),Sum('value')))              
+                
+            aggregate["data"] = data
             return aggregate
 
     def get_context_data(self, **kwargs):
 
         trends = self.get_queryset()
-        print(trends)
-
 
         if trends:
 
@@ -122,6 +110,8 @@ class TrendsAggregateMonth(ListView):
             context = {
                 'has_data': False  # флаг наличия данных
             }
+
+        print(context)
 
         return context
 
