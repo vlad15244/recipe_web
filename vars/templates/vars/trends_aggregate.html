@@ -13,7 +13,6 @@
     <a href="{% url 'trends_month' %}" class="btn btn-secondary">За текущий месяц</a>    
 </form>
 
-
     {% if has_data %}
         <table class="trends-table">
             <thead>
@@ -49,6 +48,18 @@
                         <td>{{ trends.value__min|floatformat:2 }}</td>
                     {% endfor %}
                 </tr>
+                <tr>
+                    <td>Стандартное отклонение</td>
+                    {% for trends in trends_month_aggregate.data %}
+                        <td>{{ trends.value__stddev|floatformat:2 }}</td>
+                    {% endfor %}
+                </tr>
+                <tr>
+                    <td>Дисперсия</td>
+                    {% for trends in trends_month_aggregate.data %}
+                        <td>{{ trends.value__variance|floatformat:2 }}</td>
+                    {% endfor %}
+                </tr>                
             </tbody>
         </table>      
     {% else %}

@@ -130,6 +130,7 @@ async def flush_buffer_to_db():
 
         # Сохраняем в БД
         await sync_to_async(Trends.objects.bulk_create)(records_to_create)
+        print('Буффер сохранен')
         logger.info(f"Сохранено {len(records_to_create)} записей в БД.")
 
     except Exception as e:
