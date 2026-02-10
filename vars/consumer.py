@@ -136,6 +136,32 @@ async def flush_buffer_to_db():
         logger.error(f"Ошибка при сохранении в БД: {e}")
 
 
+class OpcUaRuntime:
+    def __init__(self, plc):
+        self.plc = plc
+        self.poll_task = None
+        self.buffer_task = None
+        self.message_task = None
+
+
+    async def start(self):
+        """Запуск опроса сразу"""
+        try:
+            # Подключение к OPC UA серверу
+            await asyncio.to_thread(self.plc.run)
+            logger.info("Подключено к OPC UA серверу")
+        except Exception as e:
+            logger.error(f"Ошибка подключения к OPC UA: {e}")
+            return
+        
+        self.poll_task = asyncio.create_task(self.fetch_data())
+        self.buffer_task = asyncio.create_task(self.periodic_buffer_save())
+        self.message_task = asyncio.create_task(self.message_clock())    
+
+
+
+
+
 class OpcUaConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         await self.accept()
