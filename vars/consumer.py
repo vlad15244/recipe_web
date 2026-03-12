@@ -1,50 +1,44 @@
-from asgiref.sync import sync_to_async
 from channels.generic.websocket import AsyncWebsocketConsumer
-from opcua import Client
+from asgiref.sync import sync_to_async
 import asyncio
 import json
-from datetime import datetime
 import logging
 import os
-from .import opc_config, message_handler
+from datetime import datetime
 from django.utils import timezone
+import os
 
+# Логгер
+logger = logging.getLogger(__name__)
+
+# Импорты внутри файла (чтобы не зависеть от других модулей)
+from . import opc_config, message_handler
 from .models import Recipe, Trends, Message
 from queue import Queue
 
-
-# Буффер для архива
+# Буфер для архива
 plc_buffer = Queue(maxsize=5)
 
-logger = logging.getLogger(__name__)
-
-# Плк, который опрашивается
+# ПЛК, который опрашивается
 plc_1 = opc_config.PLC('192.168.20.50', '4840')
 # Список переменных, с которым работаем
 var_list = opc_config.VariableList()
 
-"""
-    Формирование списка переменных из json файла config
-"""
+# Загрузка конфигурации
 file_path = os.path.join(os.path.dirname(__file__), "config.json")
 with open(file_path, "r", encoding='utf-8') as f:
     data = json.load(f)
 
-""" Открываем файл с аварийными сообщенями"""
 file_path_message = os.path.join(os.path.dirname(__file__), "message.json")
 with open(file_path_message, "r", encoding='utf-8') as f:
     data_message = json.load(f)
 
-"""
-    Формируем список переменных
-"""
+# Формирование списка переменных
 for dt in data:
     var_list.add(opc_config.VariablePLC(
         dt["name"], f'{opc_config.ADR}.{dt["opc_adr"]}', plc_1, dt["scale"], dt["ID"], dt["isArchive"]))
 
-"""функция сохранения журнала ааварий по изменению переменной"""
-
-
+# Вспомогательные функции
 def toogle():
     try:
         var = var_list.get_variable_by_Name('xRegul')
@@ -54,15 +48,12 @@ def toogle():
     except Exception as e:
         print(f"Ошибка: {e}")
 
-
 def write(value, name):
     try:
         var = var_list.get_variable_by_Name(name)
         var.value = value
-
     except Exception as e:
         print(f"Ошибка: {e}")
-
 
 def recipe_save(recipe):
     try:
@@ -71,53 +62,32 @@ def recipe_save(recipe):
         var_list.get_variable_by_Name("Recipe_v2").value = recipe.var2
         var_list.get_variable_by_Name("Recipe_v3").value = recipe.var3
         var_list.get_variable_by_Name("Recipe_Name").value = recipe.name
-
     except Exception as e:
         print(f"Ошибка: {e}")
 
-
-""""""
 async def save_to_buffer():
-    """  
-        формируем буффер по всем данным, у которых стоит is_archived True, 
-        причем формируем, когда соединение с плк устновлено
-    """
+    """Формируем буфер по всем данным, у которых is_archived = True"""
     try:
-
         if plc_1.Is_Connected:
             for var in var_list.vars:
                 if var.is_archive:  # Только архивируемые переменные
                     plc_buffer.put([var.ID, float(var.value), timezone.now()])
-
             if plc_buffer.full():
-                print(plc_buffer)
-                logger.warning(
-                    "Буфер переполнен. Отбрасываем новые данные.")
+                logger.warning("Буфер переполнен. Отбрасываем новые данные.")
                 await flush_buffer_to_db()
-                return
-
     except Exception as e:
-        logger.error(f"Ошибка данных из PLC: {e}")
-
+        logger.error(f"Ошибка сохранения в буфер: {e}")
 
 async def flush_buffer_to_db():
-    """
-    Извлекает все данные из plc_buffer и сохраняет в модель TrendsPLCBuffer.
-    После сохранения буфер очищается.
-    """
+    """Сохраняем буфер в БД"""
     try:
-        # Получаем все данные из буфера (без блокировки)
         with plc_buffer.mutex:
             buffer_items = list(plc_buffer.queue)
-            plc_buffer.queue.clear()  # Очищаем буфер
-
+            plc_buffer.queue.clear()
         if not buffer_items:
             logger.info("Буфер пуст. Ничего не сохраняем в БД.")
             return
-
-        # Собираем объекты для сохранения
         records_to_create = []
-
         for batch in buffer_items:
             records_to_create.append(
                 Trends(
@@ -126,208 +96,126 @@ async def flush_buffer_to_db():
                     timestamp=batch[2]
                 )
             )
-
-        # Сохраняем в БД
         await sync_to_async(Trends.objects.bulk_create)(records_to_create)
-
         logger.info(f"Сохранено {len(records_to_create)} записей в БД.")
-
     except Exception as e:
         logger.error(f"Ошибка при сохранении в БД: {e}")
 
-
-class OpcUaRuntime:
-    def __init__(self, plc):
-        self.plc = plc
-        self.poll_task = None
-        self.buffer_task = None
-        self.message_task = None
-
-
-    async def start(self):
-        """Запуск опроса сразу"""
-        try:
-            # Подключение к OPC UA серверу
-            await asyncio.to_thread(self.plc.run)
-            logger.info("Подключено к OPC UA серверу")
-        except Exception as e:
-            logger.error(f"Ошибка подключения к OPC UA: {e}")
-            return
-        
-        self.poll_task = asyncio.create_task(self.fetch_data())
-        self.buffer_task = asyncio.create_task(self.periodic_buffer_save())
-        self.message_task = asyncio.create_task(self.message_clock())    
-
-
-
-
-
 class OpcUaConsumer(AsyncWebsocketConsumer):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.periodic_task = None
+        self.poller_task = None
+
     async def connect(self):
         await self.accept()
         logger.info("WebSocket подключён")
-
-        # Попытка подключиться к OPC UA до запуска цикла
-        try:
-            plc_1.run()
-            logger.info("Подключено к OPC UA серверу")
-        except Exception as e:
-            logger.error(f"Ошибка подключения к OPC UA: {e}")
-            await self.close()
-            return
-        # Запуск периодического опроса
-        self.task = asyncio.create_task(self.fetch_data())
-        # Запускаем поток периодического сохранения
-        self.task_buffer = asyncio.create_task(self.periodic_buffer_save())
-        # Запускаем поток формирование списка сообщений
-
-        self.message_buffer = asyncio.create_task(self.message_clock())
+        # Запускаем фоновый опрос PLC
+        if not self.poller_task or self.poller_task.done():
+            self.poller_task = asyncio.create_task(self.start_opc_poller())
+        # Запускаем периодическую отправку данных
+        if not self.periodic_task or self.periodic_task.done():
+            self.periodic_task = asyncio.create_task(self.send_periodic_data())
 
     async def disconnect(self, close_code):
         logger.info(f"WebSocket закрыт. Код: {close_code}")
-        if self.task:
-            self.task.cancel()
-        if self.task_buffer:
-            self.task_buffer.cancel()  # Отмена задачи буфера
-        if self.message_buffer:
-            self.message_buffer.cancel()  # Отмена задачи буфера
-        if plc_1.Is_Connected:
-            await asyncio.to_thread(plc_1.disconnect)
+        # Отменяем все фоновые задачи
+        if self.periodic_task:
+            self.periodic_task.cancel()
+        if self.poller_task:
+            self.poller_task.cancel()
 
-    async def fetch_data(self):
+    async def start_opc_poller(self):
+        """Фоновый опрос OPC UA"""
         while True:
             try:
-                data = await asyncio.to_thread(var_list.list_json_with_Unit)
-                await self.send(data)
-                await asyncio.sleep(0.5)
+                # Подключение к OPC UA серверу
+                if not plc_1.Is_Connected:
+                    await asyncio.to_thread(plc_1.run)
+                    logger.info("Подключено к OPC UA серверу")
+                # Обновление значений переменных
+                await asyncio.to_thread(var_list.update_values)
+                # Сохранение в буфер
+                await save_to_buffer()
+                await asyncio.sleep(0.5)  # Интервал опроса
             except Exception as e:
-                logger.error(f"Ошибка данных: {e}")
-                await asyncio.sleep(1)  # Пауза перед повторной попыткой
+                logger.error(f"Ошибка в фоновом опросе OPC UA: {e}")
+                await asyncio.sleep(5)
+
+    async def send_periodic_data(self):
+        """Периодическая отправка данных клиентам"""
+        while True:
+            try:
+                if plc_1.Is_Connected:
+                    data = await asyncio.to_thread(var_list.list_json_with_Unit)
+                    if data and data != '{}':
+                        await self.send(text_data=data)
+                else:
+                    logger.warning("Получены пустые данные от PLC")
+                    await asyncio.sleep(1)  # Интервал отправки
+
+            except asyncio.CancelledError:
+                logger.info("Периодическая отправка данных остановлена")
+                break
+            except Exception as e:
+                logger.error(f"Ошибка отправки периодических данных: {e}")
+                await asyncio.sleep(5)
 
     async def receive(self, text_data=None, bytes_data=None):
-        """
-        Обрабатывает входящие сообщения от WebSocket-клиента.
-        Поддерживает текстовые и байтовые сообщения.
-        """
         try:
             if text_data:
                 await self.handle_text_message(text_data)
-            elif bytes_data:
-                await self.handle_bytes_message(bytes_data)
         except Exception as e:
             logger.error(f"Ошибка обработки сообщения: {e}")
-            await self.close(code=4000)  # Закрываем с пользовательским кодом
+            await self.close(code=4000)
 
     async def handle_text_message(self, message: str):
-        """
-        Обработка текстового сообщения.
-        Пример: клиент может отправить команду для OPC UA.
-        """
+        """Обработка текстовых сообщений от клиента"""
         logger.info(f"Получено текстовое сообщение: {message}")
-        # Пример логики: если сообщение — команда, выполняем действие
-        if (json.loads(message)).get("action") == "regulswitch":
-            try:
-                # Выполняем чтение данных из PLC (в отдельном потоке)
-                toogle()
-            except Exception as e:
-                logger.error(f"Ошибка чтения данных из PLC: {e}")
-                await self.send(text_data=f'{{"error": "Не удалось прочитать данные: {e}"}}')
-
-        elif (json.loads(message)).get("action") == "setpoint":
-            try:
-                set_point = int((json.loads(message)).get("value"))
-                write(set_point, "SP_Regule")
-            except Exception as e:
-                logger.error(f"Ошибка чтения данных из PLC: {e}")
-                await self.send(text_data=f'{{"error": "Не удалось прочитать данные: {e}"}}')
-        elif (json.loads(message)).get("action") == "recipe":
-            try:
-                id_recipe = int((json.loads(message)).get("ID"))
-
-
-                recipe = await sync_to_async(Recipe.objects.get)(pk=id_recipe)
-
-                recipe_save(recipe)
-
-            except Exception as e:
-                logger.error(f"Ошибка чтения данных из PLC: {e}")
-                await self.send(text_data=f'{{"error": "Не удалось прочитать данные: {e}"}}')
-
-    async def handle_bytes_message(self, data: bytes):
-        """
-        Обработка байтового сообщения.
-        Можно использовать для передачи бинарных данных (например, файлов).
-        """
-        logger.info(f"Получено байтовое сообщение длиной {len(data)} байт")
-        # Здесь можно добавить логику обработки бинарных данных
-        # Например, сохранение в файл или передачу в OPC UA
-        await self.send(bytes_data=b"Received " + data)
-
-    async def periodic_buffer_save(self):
-        """Периодически сохраняет данные в буфер раз в 60 секунд.
-            Если размер больше допустимого, сохраняем в модель
-        """
-        while True:
-            try:
-                await save_to_buffer()
-                await asyncio.sleep(60)  # 60 секунд
-
-            except asyncio.CancelledError:
-                logger.info("Задача сохранения в буфер отменена")
-                break
-            except Exception as e:
-                logger.error(f"Ошибка в периодическом сохранении в буфер: {e}")
-                await asyncio.sleep(60)  #
-
-    async def message_clock(self):
-
-        await asyncio.sleep(1)
-
         try:
-            variable = var_list.get_variable_by_ID(24)
-            if variable is None:
-                logger.info(f"Ошибка")
+            data = json.loads(message)
+            action = data.get("action")
 
-            current_value = variable.AsInt()
+            if action == "regulswitch":
+                toogle()
+                await self._send_response("success", action)
+            elif action == "setpoint":
+                set_point = int(data.get("value"))
+                write(set_point, "SP_Regule")
+                await self._send_response("success", action)
+            elif action == "recipe":
+                id_recipe = int(data.get("ID"))
+                recipe = await sync_to_async(Recipe.objects.get)(pk=id)
+                recipe_save(recipe)
+                await self._send_response("success", action)
 
-            logger.info(f"Начальное значение Error1: {current_value}")
+            elif action == "get_data":
+                # Отправляем текущие данные из OPC UA
+                data = await asyncio.to_thread(var_list.list_json_with_Unit)
+                if data and data != '{}':
+                    await self.send(text_data=data)
+                else:
+                    logger.warning("По запросу get_data получены пустые данные")
+                    await self._send_error("No data available")
 
+            else:
+                await self._send_error("Unknown action")
+
+        except json.JSONDecodeError:
+            await self._send_error("Invalid JSON format")
+        except Recipe.DoesNotExist:
+            await self._send_error("Recipe not found")
+        except (ValueError, KeyError) as e:
+            await self._send_error(f"Invalid data format: {e}")
         except Exception as e:
-            logger.error(
-                f"Ошибка при получении начального значения Error1: {e}")
+            logger.error(f"Ошибка выполнения действия {action}: {e}")
+            await self._send_error(f"Failed to execute action: {e}")
 
-        while True:
-
-            try:
-                variable = var_list.get_variable_by_ID(24)
-
-                if variable is None:
-                    logger.info(f"Ошибка")
-                    await asyncio.sleep(5)
-                    continue
-
-                new_value = variable.AsInt()
-
-                if new_value != current_value:
-                    """ делаем здесь, что надо"""
-                    result = message_handler.error_handling(
-                        data_message, variable)
-                    records_to_create = []
-                    for res in result:
-                        records_to_create.append(
-                            Message(
-                                id_message=res[0],
-                                message=res[1],
-                                timestamp=timezone.now()
-                            )
-                        )
-                    # Сохраняем в БД
-                    await sync_to_async(Message.objects.bulk_create)(records_to_create)
-                    current_value = new_value
-                    # сохраняем в модель
-
-                await asyncio.sleep(1)
-
-            except Exception as e:
-                logger.error(f"Ошибка сохранения сообщений: {e}")
-                await asyncio.sleep(60)  #
+    async def _send_response(self, status: str, action: str):
+        """Вспомогательная функция для отправки успешного ответа."""
+        response = {
+            "status": status,
+            "action": action,
+            "timestamp": str(timezone.now())
+        }
+        await self.send(text_data=json.dumps(response))
