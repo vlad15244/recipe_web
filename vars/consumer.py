@@ -94,31 +94,58 @@ class OpcRuntime:
                 await asyncio.sleep(5)    
 
 class OpcUaConsumer(AsyncWebsocketConsumer):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.data_task = None
+        self._is_connected = False  # Флаг состояния соединения
+
     async def connect(self):
         await self.accept()
+        self._is_connected = True  # Устанавливаем флаг при подключении
         logger.info("WebSocket подключён")
 
-        self.data_task = asyncio.create_task(self.fetch_data())
-
-        # Попытка подключиться к OPC UA до запуска цикла
+        # Попытка подключиться к OPC UA
         try:
             logger.info("Подключено к OPC UA серверу")
+            # Здесь должен быть код подключения к OPC UA
         except Exception as e:
             logger.error(f"Ошибка подключения к OPC UA: {e}")
             await self.close()
+            self._is_connected = False
             return
 
+        # Запускаем фоновую задачу только если подключение успешно
+        self.data_task = asyncio.create_task(self.fetch_data())
+
     async def disconnect(self, close_code):
+        self._is_connected = False  # Сбрасываем флаг
         logger.info(f"WebSocket закрыт. Код: {close_code}")
 
+        # Корректно останавливаем фоновую задачу
+        if self.data_task and not self.data_task.done():
+            self.data_task.cancel()
+            try:
+                await self.data_task
+            except asyncio.CancelledError:
+                logger.info("Фоновая задача fetch_data отменена")
+
     async def fetch_data(self):
-        while True:
+        while self._is_connected:  # Проверяем статус соединения на каждой итерации
             try:
                 data = await asyncio.to_thread(var_list.list_json_with_Unit)
-                await self.send(text_data=json.dumps(data))
+                # Дополнительная проверка: отправляем данные только если соединение активно
+                if self._is_connected:
+                    await self.send(text_data=data)
                 await asyncio.sleep(0.5)
+            except asyncio.CancelledError:
+                # Задача была отменена — корректно завершаем работу
+                logger.info("Задача fetch_data была отменена")
+                break
             except Exception as e:
                 logger.error(f"Ошибка получения данных: {e}")
+                # Если соединение разорвано, выходим из цикла
+                if not self._is_connected:
+                    break
                 await asyncio.sleep(1)  # Пауза перед повторной попыткой
 
 # Инициализация глобального экземпляра OpcRuntime

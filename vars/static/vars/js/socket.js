@@ -4,6 +4,8 @@ function updateTable(data) {
   const container = document.getElementById('table-container');
   const table = document.createElement('table');
 
+
+
   // Шапка таблицы: столбцы PV и SP
   const thead = table.createTHead();
   const headerRow = thead.insertRow();
@@ -26,6 +28,7 @@ function updateTable(data) {
     // Ячейка: PV[channel]
     const cellPV = row.insertCell();
     cellPV.textContent = data[`PV${channel}`];
+
 
     // Ячейка: SP[channel]
     const cellSP = row.insertCell();
@@ -58,6 +61,7 @@ window.socket = socket;
 socket.onmessage = function(event) {
   try {
     const data = JSON.parse(event.data);
+    console.log('Тип данных:', typeof data);
     console.log('Получены данные:', data);
     updateTable(data);
     btState(data.xRegul);
