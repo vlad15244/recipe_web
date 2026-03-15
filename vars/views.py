@@ -176,12 +176,11 @@ def trends(request):
 
             trends = convert_buffer(Trends.objects.filter(
                 timestamp__month=now.month, timestamp__year=now.year))
-            print(trends)
+
 
         except ValueError:
             pass
 
-    print(trends)
     context = {
         'trends': trends,
         'selected_date': date_str,
