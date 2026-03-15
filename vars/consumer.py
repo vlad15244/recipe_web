@@ -238,6 +238,7 @@ class OpcUaConsumer(AsyncWebsocketConsumer):
 
         # Запускаем фоновую задачу только если подключение успешно
         self.data_task = asyncio.create_task(self.fetch_data())
+   
 
     async def disconnect(self, close_code):
         self._is_connected = False  # Сбрасываем флаг
@@ -269,6 +270,67 @@ class OpcUaConsumer(AsyncWebsocketConsumer):
                 if not self._is_connected:
                     break
                 await asyncio.sleep(1)  # Пауза перед повторной попыткой
+
+    async def receive(self, text_data = None, bytes_data = None):
+        if text_data:
+            await self.handle_text_message(text_data)
+        
+
+    async def handle_text_message(self, message: str):
+        """
+        Обработка текстового сообщения.
+        """
+        logger.info(f"Получено текстовое сообщение: {message}")
+        try:
+            data = json.loads(message)
+            
+            action = data.get("action")
+            print(action)
+
+            if action == "regulswitch":
+                toogle()
+
+
+            elif action == "setpoint":
+                set_point = int(data.get("value"))
+                write(set_point, "SP_Regule")
+
+
+            elif action == "recipe":
+                id_recipe = int(data.get("ID"))
+                recipe = await sync_to_async(Recipe.objects.get)(pk=id_recipe)
+                recipe_save(recipe)
+
+
+            else:
+                print("Неизвестная команда")
+
+        except json.JSONDecodeError as e:
+            logger.error(f"Ошибка парсинга JSON: {e}")
+            await self.send(text_data=f'{{"error": "Неверный формат JSON: {e}"}}')
+        except ValueError as e:
+            logger.error(f"Ошибка преобразования данных: {e}")
+            await self.send(text_data=f'{{"error": "Ошибка преобразования данных: {e}"}}')
+        except Recipe.DoesNotExist:
+            logger.error("Рецепт не найден")
+            await self.send(text_data='{"error": "Рецепт не найден"}')
+        except KeyError as e:
+            logger.error(f"Отсутствует обязательный параметр: {e}")
+            await self.send(text_data=f'{{"error": "Отсутствует параметр: {e}"}}')
+        except Exception as e:
+            logger.error(f"Общая ошибка обработки сообщения: {e}")
+            await self.send(text_data=f'{{"error": "Ошибка выполнения: {e}"}}')
+
+    async def handle_bytes_message(self, message: bytes):
+        """Обработка байтовых сообщений"""
+        logger.info(f"Получено байтовое сообщение длиной: {len(message)} байт")
+        # Здесь можно добавить логику обработки бинарных данных
+        # Например, передача на PLC в сыром виде
+        try:
+            # Пример: пересылаем байты как есть
+            await self.send(bytes_data=message)
+        except Exception as e:
+            logger.error(f"Ошибка обработки байтового сообщения: {e}")
 
 # Инициализация глобального экземпляра OpcRuntime
 opc_runtime = OpcRuntime()
