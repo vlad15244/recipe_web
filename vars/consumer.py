@@ -12,9 +12,6 @@ from .models import Trends, Message, Recipe
 
 logger = logging.getLogger(__name__)
 
-# Буфер для архива — используем asyncio.Queue
-plc_buffer = asyncio.Queue(maxsize=5)
-
 # PLC, который опрашивается
 plc_1 = opc_config.PLC('192.168.20.50', '4840')
 # Список переменных, с которым работаем
@@ -59,6 +56,21 @@ def recipe_save(recipe):
 for dt in data:
     var_list.add(opc_config.VariablePLC(
         dt["name"], f'{opc_config.ADR}.{dt["opc_adr"]}', plc_1, dt["scale"], dt["ID"], dt["isArchive"]))
+    
+
+# количество переменных, которые архивируются
+
+ARCHIVE_BUFFER = 5
+SECONDS_BETWEEN_SAVE = 30
+
+counter = 0
+
+for var in var_list.vars:
+    if var.is_archive:
+        counter += 1
+
+# Буфер для архива — используем asyncio.Queue - размер должен быть кратен кол-ву переменных с архивом 
+plc_buffer = asyncio.Queue(maxsize=counter*ARCHIVE_BUFFER)
 
 class OpcRuntime:
     def __init__(self):
@@ -70,6 +82,12 @@ class OpcRuntime:
     def start_background_tasks(self):
 
         """Запуск фоновых задач"""
+        if self.buffer_task is None or self.buffer_task.done():
+            print("Start save buffer trends")
+            self.buffer_task = asyncio.create_task(self.periodic_buffer_save())
+        if self.message_task is None or self.message_task.done():
+            self.message_task = asyncio.create_task(self.message_clock())
+        
 
     async def start(self):
         logger.info("Запуск фонового опроса PLC...")
@@ -91,7 +109,111 @@ class OpcRuntime:
 
             except Exception as e:
                 logger.error(f"Ошибка в фоновом опросе PLC: {e}")
-                await asyncio.sleep(5)    
+                await asyncio.sleep(5)   
+
+    async def stop(self):
+        """Остановка всех фоновых задач"""
+        self.running = False
+        if self.buffer_task:
+            self.buffer_task.cancel()
+            try:
+                await self.buffer_task
+            except asyncio.CancelledError:
+                pass
+
+    async def periodic_buffer_save(self):
+        while self.running:
+            try:
+                if plc_1.Is_Connected:
+
+
+                    if not plc_buffer.full():
+                        for var in var_list.vars:
+                            if var.is_archive:
+                                await plc_buffer.put([var.ID, float(var.value), timezone.now()])
+
+                    if plc_buffer.qsize() >= counter*ARCHIVE_BUFFER:
+                        
+
+                        buffer_items = []
+                        while not plc_buffer.empty():
+                            buffer_items.append(await plc_buffer.get())
+                            print(buffer_items)
+                        if not buffer_items:
+                            logger.info("Буфер пуст. Ничего не сохраняем в БД.")
+                            return
+                        records_to_create = []
+                        for batch in buffer_items:
+                            records_to_create.append(
+                                Trends(
+                                    id_var=batch[0],
+                                    value=batch[1],
+                                    timestamp=batch[2]
+                                )
+                            )
+                        await sync_to_async(Trends.objects.bulk_create)(records_to_create)
+                        print(f"Сохранено {len(records_to_create)} записей в БД.")                         
+
+                await asyncio.sleep(SECONDS_BETWEEN_SAVE)
+
+            except asyncio.CancelledError:
+                logger.info("Задача сохранения в буфер отменена")
+                break
+            except Exception as e:
+                logger.error(f"Ошибка в периодическом сохранении в буфер: {e}")
+                await asyncio.sleep(60)  
+
+    async def message_clock(self):
+        await asyncio.sleep(5)
+        try:
+            variable = var_list.get_variable_by_ID(24)
+            if variable is None:
+                logger.error("Переменная Error1 не найдена")
+                return
+            current_value = variable.AsInt()
+            logger.info(f"Начальное значение Error1: {current_value}")
+        except Exception as e:
+            logger.error(f"Ошибка при получении начального значения Error1: {e}")
+            return
+        
+        while self.running:
+            try:
+                if plc_1.Is_Connected:
+                    variable = var_list.get_variable_by_ID(24)
+                if variable is None:
+                    await asyncio.sleep(5)
+                    continue
+
+                result = None
+                
+                new_value = variable.AsInt()
+                records_to_create = []
+                if new_value != current_value:
+                    result = message_handler.error_handling(data_message, variable)
+                # Проверка на пустой результат
+                if result:
+                    for res in result:
+                        records_to_create.append(
+                            Message(
+                                id_message=res[0],
+                                message=res[1],
+                    timestamp=timezone.now())) 
+                current_value = new_value
+
+            # Вызываем bulk_create только если есть записи
+                if records_to_create:
+                    await sync_to_async(Message.objects.bulk_create)(records_to_create)
+
+                await asyncio.sleep(1)                                      
+
+            except asyncio.CancelledError:
+                logger.info("Задача message_clock отменена")
+                break
+            except Exception as e:
+                logger.error(f"Ошибка сохранения сообщений: {e}")
+                await asyncio.sleep(60)
+
+
 
 class OpcUaConsumer(AsyncWebsocketConsumer):
     def __init__(self, *args, **kwargs):
