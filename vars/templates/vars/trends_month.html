@@ -43,7 +43,14 @@
             target="_blank"
         >
             Download as PDF
-        </a>       
+        </a> 
+        <a 
+            class="btn btn-primary"
+            href="{% url 'trends_excel' %}?start_date={{ selected_date }}"
+            target="_blank"
+        >
+            Download as Excel
+        </a>      
     {% else %}
         <div class="no-data">
             <p>Нет данный за выбранный период</p>

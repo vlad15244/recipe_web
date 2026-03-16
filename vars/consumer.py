@@ -138,7 +138,7 @@ class OpcRuntime:
                         buffer_items = []
                         while not plc_buffer.empty():
                             buffer_items.append(await plc_buffer.get())
-                            print(buffer_items)
+
                         if not buffer_items:
                             logger.info("Буфер пуст. Ничего не сохраняем в БД.")
                             return
@@ -285,7 +285,7 @@ class OpcUaConsumer(AsyncWebsocketConsumer):
             data = json.loads(message)
             
             action = data.get("action")
-            print(action)
+
 
             if action == "regulswitch":
                 toogle()

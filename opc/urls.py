@@ -31,8 +31,10 @@ urlpatterns = [
     path('trends_month/', views.TrendsCurrentMonth.as_view(), name='trends_month'),    
     path('login/', views.user_login, name='login'),
     path('logout/', auth_views.LogoutView.as_view(template_name='registration/logout.html', next_page = 'login'), name='logout'),    
-    path('trends_pdf/', views.trends_pdf, name='trends_pdf'), 
+    path('trends_pdf/', views.trends_pdf, name='trends_pdf'),
+    path('trends_excel/', views.export_excel_data, name='trends_excel'),  
     path('message/', views.message, name='message'), 
     path('message_month/', views.MessageCurrentMonth.as_view(), name='message_month'), 
-    path('trends_month_aggregate/', views.TrendsAggregateMonth.as_view(), name='trends_month_aggregate'),                                
+    path('trends_month_aggregate/', views.TrendsAggregateMonth.as_view(), name='trends_month_aggregate'), 
+
 ]

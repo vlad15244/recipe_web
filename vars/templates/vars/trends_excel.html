@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+
+<link rel="stylesheet" href="{% static 'vars/css/dracula.css' %}">
+<meta charset="UTF-8">
+<style>
+    @font-face {
+        font-family: 'FreeSans';
+        /* xhtml2pdf требует абсолютный путь к файлу на диске */
+        src: url('{{ base_dir }}/static/vars/fonts/FreeSans.ttf');
+    }
+    body {
+        font-family: 'FreeSans', sans-serif;
+    }
+</style>
+</form>
+    <h1>Отчет трендов</h1>
+    <p><strong>Дата:</strong> {{ selected_date }}</p>
+    {% if has_data %}
+        <table class="trends-table">
+        <thead>
+            <tr>
+            <th>Время</th>
+            <th>PV1</th>
+            <th>PV2</th> 
+            <th>PV3</th>
+            <th>PV4</th>                        
+            </tr>
+        </thead>
+        <tbody>
+            {% for trend in trends %}
+            <tr>
+            <td>{{ trend.0 }}</td>                
+            <td>{{ trend.1 }}</td>
+            <td>{{ trend.2 }}</td>
+            <td>{{ trend.3 }}</td>
+            <td>{{ trend.4 }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+        </table>
+    {% else %}
+        <div class="no-data">
+            <p>Нет данных за указанный период</p>
+        </div>        
+    {% endif %}
+
+{% endblock %}

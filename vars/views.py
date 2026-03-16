@@ -13,6 +13,7 @@ from .forms import RecipeForm, LoginForm
 from datetime import datetime, date
 from .convert import convert_buffer
 from xhtml2pdf import pisa
+from openpyxl import Workbook
 
 
 def index(request):
@@ -256,6 +257,31 @@ def trends_pdf(request):
     if pisa_status.err:
         return HttpResponse('Error generating PDF', status=400)
     return response
+
+def export_excel_data(request):
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "Trends data"
+
+    headers = ['Timestamp', 'PV1', 'PV2', 'PV3', 'PV4'] 
+    ws.append(headers)
+
+    now = timezone.now()
+
+    trends = convert_buffer(Trends.objects.filter(
+        timestamp__month=now.month, timestamp__year=now.year))
+    
+    for tr in trends:
+        ws.append(tr)
+
+
+    response = HttpResponse(
+        content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    )
+    response['Content-Disposition'] = f'attachment; filename="report_{len(trends)}.xlsx"'
+    wb.save(response)
+    return response        
+    
 
 
 def message(request):
