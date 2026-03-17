@@ -20,10 +20,11 @@
 
             <div class="user-info">
                 {% if user.is_authenticated %}
-                    Пользователь: {{ user.username }}!  
+                    <div>Пользователь: {{ user.username }}</div>
+                    <div>Группа: {{ user.groups.first.name }}</div>
                 <form method="post" action="{% url 'logout' %}">
                 {% csrf_token %}
-                <button type="submit">Выйти</button>
+                <button type="user_submit">Выйти</button>
                 {% endif %}
             </div>        
         </div> 
