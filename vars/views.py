@@ -59,10 +59,8 @@ def one_recipe(request, recipe_id):
     context = {'recipe': recipe}
     return render(request, 'vars/recipe.html', context)
 
-
 def opcua_realtime(request):
     return render(request, 'vars/realtime.html')
-
 
 class TrendsCurrentMonth(ListView):
     model = Trends
@@ -157,7 +155,7 @@ def add_recipe(request):
         form = RecipeForm(request.POST)
         if form.is_valid():
             form.save()
-            return redirect('recipe')
+            return redirect('recipe_list')
     else:
         form = RecipeForm()
 
