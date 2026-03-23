@@ -7,6 +7,8 @@ from django.views.generic.list import ListView
 from django.utils import timezone
 from django.db.models import Avg, Max, Sum, Min, Variance, StdDev
 
+from django.http import HttpResponseNotAllowed
+
 from .models import Recipe, Trends, Message
 from .forms import RecipeForm, LoginForm
 
@@ -27,6 +29,7 @@ def index(request):
 def recipe_edit(request, pk):
     instance = get_object_or_404(Recipe, pk=pk)
 
+
     if request.method == "POST":
 
         form = RecipeForm(request.POST, instance=instance)
@@ -42,19 +45,15 @@ def recipe_edit(request, pk):
 def recipe_delete(request, pk):
     instance = get_object_or_404(Recipe, pk=pk)
 
+
     if request.method == "POST":
 
         if instance:
             instance.delete()
-            return redirect('recipe_list')        
-        
+            return redirect('recipe_list') 
     else:
-        form = RecipeForm(instance=instance)
-
-    return render(request, 'vars/edit.html', {'form': form})
-    
-
-
+        return render(request, 'vars/confirm_delete.html', {'recipe': instance})    
+        
 def one_recipe(request, recipe_id):
     recipe = Recipe.objects.get(pk=recipe_id)
     context = {'recipe': recipe}

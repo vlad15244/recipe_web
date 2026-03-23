@@ -16,13 +16,10 @@ table.addEventListener('click', function(event) {
 
         //Кнопка Просмотр
         const btn_show = document.querySelector('.btn_show');
-        console.log(`Клик по ${btn_show.href}`);
         btn_show.href = String(ID);
         const btn_edit = document.querySelector('.btn_edit');
-        console.log(`Клик по ${btn_edit.href}`);
         btn_edit.href = String(ID) + "/edit/"; 
         const btn_delete = document.querySelector('.btn_delete');
-        console.log(`Клик по ${btn_edit.href}`);
         btn_delete.href = String(ID) + "/delete/";                
         visible_btn_show(ID);
         visible_btn_edit(ID);
@@ -117,7 +114,8 @@ window.addEventListener('beforeunload', () => {
 document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('onsave').style.visibility = 'hidden';
     document.querySelector('.btn_show').style.visibility = 'hidden';
-    document.querySelector('.btn_edit').style.visibility = 'hidden';    
+    document.querySelector('.btn_edit').style.visibility = 'hidden'; 
+    document.querySelector('.btn_delete').style.visibility = 'hidden';       
 });
 
 
