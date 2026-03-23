@@ -30,7 +30,7 @@ def recipe_edit(request, pk):
     if request.method == "POST":
 
         form = RecipeForm(request.POST, instance=instance)
-        print('request.method')
+
         if form.is_valid():
             form.save()
             return redirect('recipe_list')
@@ -38,6 +38,21 @@ def recipe_edit(request, pk):
         form = RecipeForm(instance=instance)
 
     return render(request, 'vars/edit.html', {'form': form})
+
+def recipe_delete(request, pk):
+    instance = get_object_or_404(Recipe, pk=pk)
+
+    if request.method == "POST":
+
+        if instance:
+            instance.delete()
+            return redirect('recipe_list')        
+        
+    else:
+        form = RecipeForm(instance=instance)
+
+    return render(request, 'vars/edit.html', {'form': form})
+    
 
 
 def one_recipe(request, recipe_id):

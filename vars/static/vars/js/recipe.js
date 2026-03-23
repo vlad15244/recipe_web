@@ -20,9 +20,13 @@ table.addEventListener('click', function(event) {
         btn_show.href = String(ID);
         const btn_edit = document.querySelector('.btn_edit');
         console.log(`Клик по ${btn_edit.href}`);
-        btn_edit.href = String(ID) + "/edit/";        
+        btn_edit.href = String(ID) + "/edit/"; 
+        const btn_delete = document.querySelector('.btn_delete');
+        console.log(`Клик по ${btn_edit.href}`);
+        btn_delete.href = String(ID) + "/delete/";                
         visible_btn_show(ID);
-        visible_btn_edit(ID); 
+        visible_btn_edit(ID);
+        visible_btn_delete(ID);
 
         //recipe_save(ID, socket);
         console.log(`Клик по ячейке: Строка ${rowIndex}, Столбец ${cellIndex}, Содержимое: ${cellContent}`);
@@ -82,6 +86,19 @@ function visible_btn_show(value) {
 
 function visible_btn_edit(value) {
   const btn = document.querySelector('.btn_edit');
+  const Val = Number(value);
+
+  if (!isNaN(Val) && Val > 0){
+    btn.style.visibility = 'visible';
+  } else
+  {
+    btn.style.visibility = 'hidden';    
+  }
+
+}
+
+function visible_btn_delete(value) {
+  const btn = document.querySelector('.btn_delete');
   const Val = Number(value);
 
   if (!isNaN(Val) && Val > 0){
