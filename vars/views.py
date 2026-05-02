@@ -238,6 +238,54 @@ def draw(request):
     template = loader.get_template('vars/draw.html')
     return HttpResponse(template.render(context, request))       
 
+def draw_pdf(request):
+
+    date_str = request.GET.get('start_date')
+
+    trends = []
+    if date_str:
+        try:
+            date_time = datetime.strptime(date_str, '%Y-%m-%d').date()
+
+            trends = convert_buffer(Trends.objects.filter(
+                timestamp__date=date_time))
+            
+        except ValueError:
+            pass
+
+    else:
+        try:
+
+            now = timezone.now()
+
+            trends = convert_buffer(Trends.objects.filter(
+                timestamp__month=now.month, timestamp__year=now.year))
+
+
+        except ValueError:
+            pass
+
+    context = {
+        'trends': json.dumps(trends),
+        'selected_date': date_str,
+        'has_data': len(trends) > 0  # флаг наличия данных
+    }
+
+    template = loader.get_template('vars/draw_pdf.html')
+    html = template.render(context)
+
+    # Генерируем PDF
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="trends_draw_{date_str or "all"}.pdf"'
+
+    pisa_status = pisa.CreatePDF(
+        html, dest=response, encoding='utf-8'
+    )
+
+    if pisa_status.err:
+        return HttpResponse('Error generating PDF', status=400)
+    return response
+
 def user_login(request):
     if request.method == 'POST':
         form = LoginForm(request.POST)
@@ -280,15 +328,15 @@ def trends_pdf(request):
     trends_list = list(trends_queryset)
     trends = convert_buffer(trends_list)
 
-    # Подготавливаем контекст для шаблона PDF
+
     context = {
-        'base_dir': settings.BASE_DIR,  # Передаем путь к проекту
+        'base_dir': settings.BASE_DIR,  
         'trends': trends,
         'selected_date': date_str or 'Все данные',
         'has_data': len(trends) > 0
     }
 
-    # Загружаем шаблон для PDF
+
     template = loader.get_template('vars/trends_pdf.html')
     html = template.render(context)
 
