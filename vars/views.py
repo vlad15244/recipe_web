@@ -16,6 +16,7 @@ from datetime import datetime, date
 from .convert import convert_buffer
 from xhtml2pdf import pisa
 from openpyxl import Workbook
+import json
 
 
 def index(request):
@@ -203,6 +204,39 @@ def trends(request):
     template = loader.get_template('vars/trends.html')
     return HttpResponse(template.render(context, request))
 
+def draw(request):
+
+    date_str = request.GET.get('start_date')
+    if date_str:
+        try:
+            date_time = datetime.strptime(date_str, '%Y-%m-%d').date()
+
+            trends = convert_buffer(Trends.objects.filter(
+                timestamp__date=date_time))
+            
+        except ValueError:
+            pass
+
+    else:
+        try:
+
+            now = timezone.now()
+
+            trends = convert_buffer(Trends.objects.filter(
+                timestamp__month=now.month, timestamp__year=now.year))
+
+
+        except ValueError:
+            pass
+
+    context = {
+        'trends': json.dumps(trends),
+        'selected_date': date_str,
+        'has_data': len(trends) > 0  # флаг наличия данных
+    }
+
+    template = loader.get_template('vars/draw.html')
+    return HttpResponse(template.render(context, request))       
 
 def user_login(request):
     if request.method == 'POST':

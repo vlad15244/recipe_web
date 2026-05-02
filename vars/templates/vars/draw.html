@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block title %}График{% endblock %}
+
+{% block content %}
+<canvas id="myChart" width="400" height="200"></canvas>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+   const ctx = document.getElementById('myChart').getContext('2d');
+   const myData = JSON.parse('{{ trends|safe }}');
+
+   const myLabel = myData.map(item => item[0]);
+
+   const myValues = myData.map(item => item[1]);
+   const myValues2 = myData.map(item => item[2]);
+   const myValues3 = myData.map(item => item[3]);
+   const myValues4 = myData.map(item => item[5]);         
+
+   const myChart = new Chart(ctx, {
+        type: 'line',
+            data: {
+                labels: myLabel,
+                datasets: [{
+                    label: 'PV 1',
+                    data: myValues,
+                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1
+                },
+{
+                    label: 'PV 2',
+                    data: myValues2,
+                    backgroundColor: 'rgba(207, 112, 61, 0.2)',
+                    borderColor: 'rgba(207, 112, 61, 1)',
+                    borderWidth: 1
+                },
+{
+                    label: 'PV 3',
+                    data: myValues3,
+                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1
+                },
+{
+                    label: 'PV 4',
+                    data: myValues4,
+                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1
+                },                                                
+            
+            
+            ]
+                
+        }
+
+   })
+</script>
+{% endblock %}

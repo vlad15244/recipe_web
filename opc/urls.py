@@ -37,5 +37,6 @@ urlpatterns = [
     path('message/', views.message, name='message'), 
     path('message_month/', views.MessageCurrentMonth.as_view(), name='message_month'), 
     path('trends_month_aggregate/', views.TrendsAggregateMonth.as_view(), name='trends_month_aggregate'), 
+    path('draw/', views.draw, name='draw'),     
 
 ]
