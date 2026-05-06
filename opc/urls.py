@@ -38,6 +38,7 @@ urlpatterns = [
     path('message_month/', views.MessageCurrentMonth.as_view(), name='message_month'), 
     path('trends_month_aggregate/', views.TrendsAggregateMonth.as_view(), name='trends_month_aggregate'), 
     path('draw/', views.draw, name='draw'),
-    path('draw_pdf/', views.draw_pdf, name='draw_pdf'),         
+    path('draw_pdf/', views.draw_pdf, name='draw_pdf'), 
+    path('trends_prev_month/', views.trends_prev_month, name='trends_prev_month'),        
 
 ]

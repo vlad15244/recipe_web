@@ -6,8 +6,9 @@ from django.conf import settings
 from django.views.generic.list import ListView
 from django.utils import timezone
 from django.db.models import Avg, Max, Sum, Min, Variance, StdDev
+from django.views.decorators.csrf import csrf_exempt
 
-from django.http import HttpResponseNotAllowed
+from django.http import HttpResponseNotAllowed, JsonResponse
 
 from .models import Recipe, Trends, Message
 from .forms import RecipeForm, LoginForm
@@ -400,3 +401,10 @@ def message(request):
     print(messages)
     template = loader.get_template('vars/message.html')
     return HttpResponse(template.render(context, request))
+
+@csrf_exempt
+def trends_prev_month(request):
+
+    if  request.method == "POST":
+        now = timezone.now()
+        return JsonResponse({"moth" : now.month})

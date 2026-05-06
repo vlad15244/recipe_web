@@ -14,7 +14,7 @@
    const myValues = myData.map(item => item[1]);
    const myValues2 = myData.map(item => item[2]);
    const myValues3 = myData.map(item => item[3]);
-   const myValues4 = myData.map(item => item[5]);         
+   const myValues4 = myData.map(item => item[5]); 
 
    const myChart = new Chart(ctx, {
         type: 'line',
@@ -54,7 +54,10 @@
                 
         }
 
-   })
+   }) 
+
+   
+
 </script>
 <a 
     class="btn btn-primary"
@@ -63,4 +66,29 @@
 >
     Download as PDF
 </a> 
+<a id="page"
+    class="btn btn-prev"
+>
+    Предыдущий месяц
+</a>
+<script>
+    const page_btn = document.getElementById("page");
+page_btn.addEventListener("click", update);
+
+function update(){
+    fetch('/trends_prev_month/', 
+        {
+            method : 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        }
+    )
+    .then(response => response.json())
+    .then(data => console.log('Успех:', data))
+    .catch(error => console.error('Ошибка:', error));
+}
+ 
+</script> 
+
 {% endblock %}
