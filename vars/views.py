@@ -407,4 +407,10 @@ def trends_prev_month(request):
 
     if  request.method == "POST":
         now = timezone.now()
-        return JsonResponse({"moth" : now.month})
+
+        trends = convert_buffer(Trends.objects.filter(
+        timestamp__month=now.month - 1, timestamp__year=now.year))
+        print(trends)
+
+        return JsonResponse({"moth" : now.month - 1, "trends" : trends})
+    
